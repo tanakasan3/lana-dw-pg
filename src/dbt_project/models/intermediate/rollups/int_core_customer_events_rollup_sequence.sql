@@ -10,10 +10,19 @@ with
 
     transformed as (
         select
-            * except (customer_id, created_at, modified_at),
+            version,
+            activity,
+            applicant_id,
+            customer_type,
+            email,
+            kyc_verification,
+            level,
+            public_id,
+            telegram_handle,
+            is_kyc_approved,
+            loaded_to_dw_at,
             customer_id,
             created_at as customer_created_at,
-
             modified_at as customer_modified_at
         from source
     )
