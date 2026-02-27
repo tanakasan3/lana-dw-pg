@@ -12,6 +12,7 @@ RUN apk --no-cache add \
     libffi-dev \
     openssl-dev \
     postgresql-dev \
+    postgresql-client \
     && update-ca-certificates
 
 RUN pip install --upgrade pip
