@@ -3,15 +3,26 @@ with
         select * from {{ ref("int_core_credit_facility_events_rollup") }} where approved
     ),
 
+    -- Get most recent collateral deposit per credit facility
+    collateral_deposits_ranked as (
+        select
+            credit_facility_id,
+            credit_facility_modified_at,
+            collateral_amount_btc,
+            row_number() over (
+                partition by credit_facility_id 
+                order by credit_facility_modified_at desc
+            ) as rn
+        from {{ ref("int_core_credit_facility_events_rollup_sequence") }}
+    ),
+
     collateral_deposits as (
         select
             credit_facility_id,
-            max(credit_facility_modified_at) as most_recent_collateral_deposit_at,
-            any_value(
-                collateral_amount_btc having max credit_facility_modified_at
-            ) as most_recent_collateral_deposit_amount_btc
-        from {{ ref("int_core_credit_facility_events_rollup_sequence") }}
-        group by credit_facility_id
+            credit_facility_modified_at as most_recent_collateral_deposit_at,
+            collateral_amount_btc as most_recent_collateral_deposit_amount_btc
+        from collateral_deposits_ranked
+        where rn = 1
     ),
 
     disbursals as (
@@ -26,7 +37,7 @@ with
                 partition by credit_facility_id
             ) as min_disbursal_settled_recorded_at,
             amount_usd
-            / sum(amount_usd) over (partition by credit_facility_id) as disbursal_ratio
+            / nullif(sum(amount_usd) over (partition by credit_facility_id), 0) as disbursal_ratio
         from {{ ref("int_core_disbursal_events_rollup") }}
         where is_settled
     ),
@@ -47,10 +58,10 @@ with
             sum(coalesce(interest_usd, 0)) as cf_total_interest_paid_usd,
             sum(coalesce(disbursal_usd, 0)) as cf_total_disbursal_paid_usd,
             max(
-                if(interest_usd > 0, effective, null)
+                case when interest_usd > 0 then effective else null end
             ) as most_recent_interest_payment_timestamp,
             max(
-                if(disbursal_usd > 0, effective, null)
+                case when disbursal_usd > 0 then effective else null end
             ) as most_recent_disbursal_payment_timestamp
         from {{ ref("int_payment_events") }}
         group by credit_facility_id
@@ -64,16 +75,8 @@ with
             cf_total_interest_incurred_usd,
             cf_total_interest_paid_usd,
             cf_total_disbursal_paid_usd,
-            timestamp_diff(
-                most_recent_interest_payment_timestamp,
-                disbursal_settled_recorded_at,
-                day
-            ) as disbursal_interest_days,
-            timestamp_diff(
-                most_recent_interest_payment_timestamp,
-                min_disbursal_settled_recorded_at,
-                day
-            ) as credit_facility_interest_days
+            extract(day from most_recent_interest_payment_timestamp - disbursal_settled_recorded_at)::integer as disbursal_interest_days,
+            extract(day from most_recent_interest_payment_timestamp - min_disbursal_settled_recorded_at)::integer as credit_facility_interest_days
         from disbursals
         left join payments using (credit_facility_id)
         left join interest using (credit_facility_id)
@@ -87,23 +90,20 @@ with
             credit_facility_interest_days,
             disbursal_ratio
             * disbursal_interest_days as disbursal_weighted_interest_days,
-            safe_divide(
-                disbursal_ratio * disbursal_interest_days,
+            (disbursal_ratio * disbursal_interest_days) / nullif(
                 sum(disbursal_ratio * disbursal_interest_days) over (
                     partition by credit_facility_id
-                )
+                ), 0
             ) as interest_paid_ratio,
-            cf_total_interest_paid_usd * safe_divide(
-                disbursal_ratio * disbursal_interest_days,
+            cf_total_interest_paid_usd * (disbursal_ratio * disbursal_interest_days) / nullif(
                 sum(disbursal_ratio * disbursal_interest_days) over (
                     partition by credit_facility_id
-                )
+                ), 0
             ) as interest_paid_usd,
-            cf_total_interest_incurred_usd * safe_divide(
-                disbursal_ratio * disbursal_interest_days,
+            cf_total_interest_incurred_usd * (disbursal_ratio * disbursal_interest_days) / nullif(
                 sum(disbursal_ratio * disbursal_interest_days) over (
                     partition by credit_facility_id
-                )
+                ), 0
             ) as interest_incurred_usd,
             disbursal_ratio * cf_total_disbursal_paid_usd as disbursal_paid_usd
         from interest_paid_stats
@@ -175,7 +175,7 @@ with
             coalesce(interest_paid_ratio, 0) as interest_paid_ratio,
             coalesce(interest_paid_usd, 0) as interest_paid_usd,
             coalesce(disbursal_paid_usd, 0) as disbursal_paid_usd,
-            credit_facility_maturity_at < current_date() as matured
+            credit_facility_maturity_at < current_date as matured
 
         from approved_credit_facilities
         inner join disbursals using (credit_facility_id)
