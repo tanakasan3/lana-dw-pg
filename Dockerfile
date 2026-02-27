@@ -18,8 +18,10 @@ RUN apk --no-cache add \
 RUN pip install --upgrade pip
 
 # Install dagster and dependencies
+# Note: dagster extensions (postgres, dbt, dlt) use 0.x versioning
+# dagster and dagster-webserver use 1.x versioning
 ARG DAGSTER_VERSION=1.12.0
-ARG DAGSTER_EXT_VERSION=0.28.1
+ARG DAGSTER_EXT_VERSION=0.28.0
 ARG OTEL_VERSION=1.38.0
 
 RUN pip install \
@@ -32,10 +34,14 @@ RUN pip install \
     opentelemetry-exporter-otlp-proto-grpc~=${OTEL_VERSION}
 
 # Install data pipeline packages (PostgreSQL only)
+# Note: dbt-postgres 1.10.0 is the latest, dbt-core must match
+ARG DBT_VERSION=1.10.0
+ARG DLT_VERSION=1.18.1
+
 RUN pip install \
-    dbt-core~=1.10.3 \
-    dbt-postgres~=1.10.3 \
-    dlt[postgres]~=1.18.1 \
+    dbt-core~=${DBT_VERSION} \
+    dbt-postgres~=${DBT_VERSION} \
+    dlt[postgres]~=${DLT_VERSION} \
     pandas \
     requests \
     sqlalchemy \

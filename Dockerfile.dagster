@@ -5,12 +5,15 @@ ENV PYTHONUNBUFFERED=1
 RUN apk --no-cache add \
     curl \
     ca-certificates \
+    postgresql-client \
     && update-ca-certificates
 
 RUN pip install --upgrade pip
 
+# Note: dagster and dagster-webserver use 1.x versioning
+# dagster-postgres uses 0.x versioning
 ARG DAGSTER_VERSION=1.12.0
-ARG DAGSTER_EXT_VERSION=0.28.1
+ARG DAGSTER_EXT_VERSION=0.28.0
 
 RUN pip install \
     dagster~=${DAGSTER_VERSION} \
