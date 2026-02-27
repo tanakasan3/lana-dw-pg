@@ -20,7 +20,7 @@ select
     '{{ npb4_17_09_tipos_de_garantias("Pignorada - Depósito de dinero") }}'
     as {{ ident('tipo_garantia') }},
     coalesce(
-        safe_divide(collateral_amount_usd, loan_amount_usd) * 100, 1
+        (collateral_amount_usd)::numeric / nullif((loan_amount_usd)::numeric, 0) * 100, 1
     ) as {{ ident('valor_garantia_proporcional') }}
 
 from loans_and_credit_facilities

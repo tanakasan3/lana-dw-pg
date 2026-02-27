@@ -16,9 +16,9 @@ select
     'TODO' as `Número Telefónico`,
     'TODO' as `Departamento`,
     '0' as `Relacionado por administración`,
-    split(first_name, ' ')[safe_offset(0)] as `Primer Nombre`,
-    split(first_name, ' ')[safe_offset(1)] as `Segundo Nombre`,
-    split(last_name, ' ')[safe_offset(0)] as `Primer Apellido`,
-    split(last_name, ' ')[safe_offset(1)] as `Segundo Apellido`,
+    split(first_name, ' ')[0 + 1] as `Primer Nombre`,
+    split(first_name, ' ')[1 + 1] as `Segundo Nombre`,
+    split(last_name, ' ')[0 + 1] as `Primer Apellido`,
+    split(last_name, ' ')[1 + 1] as `Segundo Apellido`,
     left(replace(customer_id, '-', ''), 14) as `NIU`
 from customers

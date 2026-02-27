@@ -4,7 +4,7 @@ select
     left(`Primer Apellido`, 30) as `Primer Apellido`,
     left(`Segundo Apellido`, 30) as `Segundo Apellido`,
     left(`Apellido de casada`, 30) as `Apellido de casada`,
-    format_date('%Y%m%d', cast(`Fecha de ingreso` as date)) as `Fecha de ingreso`,
+    to_char( cast(`Fecha de ingreso` as date), 'YYYY-MM-DD') as `Fecha de ingreso`,
     left(`Cargo`, 50) as `Cargo`,
     left(`NIU`, 25) as `NIU`,
     left(`Código del documento`, 5) as `Código del documento`,

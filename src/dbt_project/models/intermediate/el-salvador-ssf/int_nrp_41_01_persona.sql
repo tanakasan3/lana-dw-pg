@@ -6,14 +6,14 @@ select
 
     dui,
 
-    upper(split(last_name, ' ')[safe_offset(0)]) as {{ ident('primer_apellido') }},
-    upper(split(last_name, ' ')[safe_offset(1)]) as {{ ident('segundo_apellido') }},
-    upper(split(first_name, ' ')[safe_offset(0)]) as {{ ident('primer_nombre') }},
-    upper(split(first_name, ' ')[safe_offset(1)]) as {{ ident('segundo_nombre') }},
-    cast(null as string) as {{ ident('apellido_casada') }},
+    upper(split(last_name, ' ')[0 + 1]) as {{ ident('primer_apellido') }},
+    upper(split(last_name, ' ')[1 + 1]) as {{ ident('segundo_apellido') }},
+    upper(split(first_name, ' ')[0 + 1]) as {{ ident('primer_nombre') }},
+    upper(split(first_name, ' ')[1 + 1]) as {{ ident('segundo_nombre') }},
+    cast(null as text) as {{ ident('apellido_casada') }},
 
     -- NULL for natural person
-    cast(null as string) as {{ ident('nombre_sociedad') }},
+    cast(null as text) as {{ ident('nombre_sociedad') }},
 
     -- '1' for natural person
     '1' as {{ ident('tipo_persona') }},
@@ -24,7 +24,7 @@ select
     'U' as {{ ident('tipo_identificador') }},
 
     -- NULL for non-Salvadoran
-    cast(null as string) as {{ ident('nit_desactualizado') }},
+    cast(null as text) as {{ ident('nit_desactualizado') }},
 
     case
         when country_of_residence_alpha_3_code = 'SLV' then 'Y' else 'N'
@@ -34,8 +34,8 @@ select
     -- i.e. the one that generates the greatest cash flow
     economic_activity_code as {{ ident('giro_persona') }},
 
-    cast(null as string) as {{ ident('tamano_empresa') }},
-    cast(null as string) as {{ ident('tipo_empresa') }},
+    cast(null as text) as {{ ident('tamano_empresa') }},
+    cast(null as text) as {{ ident('tipo_empresa') }},
 
     -- Provision of sanitation reserves established accounted for by the entity for
     -- each debtor
@@ -71,8 +71,8 @@ select
     tax_id_number as {{ ident('id_pais_origen') }},
 
     nationality_code as {{ ident('nacionalidad') }},
-    cast(null as string) as {{ ident('nit_anterior') }},
-    cast(null as string) as {{ ident('tipo_ident_anterior') }},
+    cast(null as text) as {{ ident('nit_anterior') }},
+    cast(null as text) as {{ ident('tipo_ident_anterior') }},
 
     el_salvador_municipality as {{ ident('distrito_residencia') }}
 

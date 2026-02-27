@@ -120,8 +120,8 @@ select
     end as {{ ident('pago_interes') }},
     cast(null as int64) as {{ ident('periodo_gracia_k') }},
     cast(null as int64) as {{ ident('periodo_gracia_i') }},
-    cast(null as string) as {{ ident('garante') }},
-    cast(null as string) as {{ ident('emisión') }},
+    cast(null as text) as {{ ident('garante') }},
+    cast(null as text) as {{ ident('emisión') }},
 
     -- join to customer identities's country_of_residence_code?
     9300 as {{ ident('pais_destino_credito') }},
@@ -156,7 +156,7 @@ select
     cast(null as date) as {{ ident('ultima_fecha_venc') }},
     cast(null as numeric) as {{ ident('dias_prorroga') }},
     cast(null as numeric) as {{ ident('monto_desembolsado') }},
-    cast(null as string) as {{ ident('tipo_credito') }},
+    cast(null as text) as {{ ident('tipo_credito') }},
     date(most_recent_interest_payment_timestamp) as {{ ident('fecha_ultimo_pago_k') }},
     date(most_recent_capital_payment_timestamp) as {{ ident('fecha_ultimo_pago_i') }},
     extract(day from most_recent_interest_payment_timestamp) as {{ ident('dia_pago_k') }},
@@ -182,18 +182,18 @@ select
 
     cast(null as numeric) as {{ ident('saldo_seguro') }},
     cast(null as numeric) as {{ ident('saldo_costas_procesales') }},
-    cast(null as string) as {{ ident('tipo_tarjeta_credito') }},
-    cast(null as string) as {{ ident('clase_tarjeta_credito') }},
-    cast(null as string) as {{ ident('producto_tarjeta_credito') }},
+    cast(null as text) as {{ ident('tipo_tarjeta_credito') }},
+    cast(null as text) as {{ ident('clase_tarjeta_credito') }},
+    cast(null as text) as {{ ident('producto_tarjeta_credito') }},
 
     -- Sum of the proportional values ​​of each guarantee[3.6]
     collateral_amount_usd,
     collateral_amount_usd as {{ ident('valor_garantia_cons') }},
 
-    cast(null as string) as {{ ident('distrito_otorgamiento') }},
+    cast(null as text) as {{ ident('distrito_otorgamiento') }},
     reserve,
     reserve as {{ ident('reserva_referencia') }},
-    cast(null as string) as {{ ident('etapa_judicial') }},
+    cast(null as text) as {{ ident('etapa_judicial') }},
     cast(null as date) as {{ ident('fecha_demanda') }},
     duration_value as {{ ident('plazo_credito') }},
     'SO' as {{ ident('orden_descuento') }},
@@ -205,12 +205,12 @@ select
     cast(null as date) as {{ ident('fecha_pago') }},
     cast(null as numeric) as {{ ident('porcenta_reserva_descon') }},
     cast(null as numeric) as {{ ident('porcenta_adiciona_descon') }},
-    cast(null as string) as {{ ident('depto_destino_credito') }},
+    cast(null as text) as {{ ident('depto_destino_credito') }},
     reserve_percentage,
     reserve_percentage as {{ ident('porc_reserva_referencia') }},
     cast(null as numeric) as {{ ident('calculo_brecha') }},
     cast(null as numeric) as {{ ident('ajuste_brecha') }},
-    cast(null as string) as {{ ident('programa_asist_cafe') }},
+    cast(null as text) as {{ ident('programa_asist_cafe') }},
     cast(null as date) as {{ ident('fecha_cump_cafe') }}
 
 from final

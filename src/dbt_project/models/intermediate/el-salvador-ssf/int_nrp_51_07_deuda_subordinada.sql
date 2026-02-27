@@ -5,7 +5,7 @@ with
     final as (select * from account_balances)
 
 select
-    cast(null as string) as {{ ident('id_codigo_deuda') }},
-    cast(null as string) as {{ ident('desc_deuda') }},
+    cast(null as text) as {{ ident('id_codigo_deuda') }},
+    cast(null as text) as {{ ident('desc_deuda') }},
     cast(null as numeric) as {{ ident('valor_deuda') }}
 from final

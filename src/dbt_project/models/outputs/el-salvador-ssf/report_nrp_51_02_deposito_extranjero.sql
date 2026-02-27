@@ -3,5 +3,5 @@ select
     left({{ ident('nom_banco') }}, 80) as {{ ident('nom_banco') }},
     left(`Pais`, 20) as `Pais`,
     left(`Categoria`, 2) as `Categoria`,
-    cast(round(`Valor`, 2) as string) as `Valor`
+    cast(round(`Valor`, 2) as text) as `Valor`
 from {{ ref("int_nrp_51_02_deposito_extranjero") }}

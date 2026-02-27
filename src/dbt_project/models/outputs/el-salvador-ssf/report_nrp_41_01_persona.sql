@@ -1,6 +1,6 @@
 select
-    cast({{ ident('pais_residencia') }} as string) as {{ ident('pais_residencia') }},
-    cast({{ ident('nacionalidad') }} as string) as {{ ident('nacionalidad') }},
+    cast({{ ident('pais_residencia') }} as text) as {{ ident('pais_residencia') }},
+    cast({{ ident('nacionalidad') }} as text) as {{ ident('nacionalidad') }},
     left({{ ident('nit_persona') }}, 14) as {{ ident('nit_persona') }},
     left({{ ident('dui') }}, 9) as {{ ident('dui') }},
     left({{ ident('primer_apellido') }}, 25) as {{ ident('primer_apellido') }},
@@ -22,7 +22,7 @@ select
     left({{ ident('numero_cliente') }}, 17) as {{ ident('numero_cliente') }},
     left({{ ident('id_alterno') }}, 20) as {{ ident('id_alterno') }},
     left({{ ident('tipo_id_alterno') }}, 2) as {{ ident('tipo_id_alterno') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_nacimiento') }} as date)) as {{ ident('fecha_nacimiento') }},
+    to_char( cast({{ ident('fecha_nacimiento') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_nacimiento') }},
     format('%.2f', round({{ ident('riesgo_consolidado') }}, 2)) as {{ ident('riesgo_consolidado') }},
     left({{ ident('sexo_persona') }}, 1) as {{ ident('sexo_persona') }},
     left({{ ident('ocupación') }}, 3) as {{ ident('ocupación') }},

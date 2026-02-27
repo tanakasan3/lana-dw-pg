@@ -10,27 +10,27 @@ select
     format('%.2f', round({{ ident('saldo_vigente_i') }}, 2)) as {{ ident('saldo_vigente_i') }},
     format('%.2f', round({{ ident('saldo_vencido_i') }}, 2)) as {{ ident('saldo_vencido_i') }},
     format('%.2f', round({{ ident('abono_deposito') }}, 2)) as {{ ident('abono_deposito') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_otorgamiento') }} as date)) as {{ ident('fecha_otorgamiento') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_vencimiento') }} as date)) as {{ ident('fecha_vencimiento') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_castigo') }} as date)) as {{ ident('fecha_castigo') }},
+    to_char( cast({{ ident('fecha_otorgamiento') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_otorgamiento') }},
+    to_char( cast({{ ident('fecha_vencimiento') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_vencimiento') }},
+    to_char( cast({{ ident('fecha_castigo') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_castigo') }},
     left({{ ident('estado_credito') }}, 1) as {{ ident('estado_credito') }},
     format('%.2f', round({{ ident('saldo_mora_k') }}, 2)) as {{ ident('saldo_mora_k') }},
     format('%.2f', round({{ ident('saldo_mora_i') }}, 2)) as {{ ident('saldo_mora_i') }},
-    cast({{ ident('dias_mora_k') }} as string) as {{ ident('dias_mora_k') }},
-    cast({{ ident('dias_mora_i') }} as string) as {{ ident('dias_mora_i') }},
-    format_date(
-        '%Y-%m-%d', cast({{ ident('fecha_inicio_mora_k') }} as date)
+    cast({{ ident('dias_mora_k') }} as text) as {{ ident('dias_mora_k') }},
+    cast({{ ident('dias_mora_i') }} as text) as {{ ident('dias_mora_i') }},
+    to_char(
+        'YYYY-MM-DD', cast({{ ident('fecha_inicio_mora_k') }} as date)
     ) as {{ ident('fecha_inicio_mora_k') }},
-    format_date(
-        '%Y-%m-%d', cast({{ ident('fecha_inicio_mora_i') }} as date)
+    to_char(
+        'YYYY-MM-DD', cast({{ ident('fecha_inicio_mora_i') }} as date)
     ) as {{ ident('fecha_inicio_mora_i') }},
     left({{ ident('pago_capital') }}, 1) as {{ ident('pago_capital') }},
     left({{ ident('pago_interes') }}, 1) as {{ ident('pago_interes') }},
-    cast({{ ident('periodo_gracia_k') }} as string) as {{ ident('periodo_gracia_k') }},
-    cast({{ ident('periodo_gracia_i') }} as string) as {{ ident('periodo_gracia_i') }},
+    cast({{ ident('periodo_gracia_k') }} as text) as {{ ident('periodo_gracia_k') }},
+    cast({{ ident('periodo_gracia_i') }} as text) as {{ ident('periodo_gracia_i') }},
     left({{ ident('garante') }}, 10) as {{ ident('garante') }},
     left({{ ident('emisión') }}, 15) as {{ ident('emisión') }},
-    cast({{ ident('pais_destino_credito') }} as string) as {{ ident('pais_destino_credito') }},
+    cast({{ ident('pais_destino_credito') }} as text) as {{ ident('pais_destino_credito') }},
     left({{ ident('destino') }}, 6) as {{ ident('destino') }},
     left({{ ident('codigo_moneda') }}, 1) as {{ ident('codigo_moneda') }},
     format('%.2f', round({{ ident('tasa_interes') }}, 2)) as {{ ident('tasa_interes') }},
@@ -40,24 +40,24 @@ select
     left({{ ident('tipo_tasa_interes') }}, 1) as {{ ident('tipo_tasa_interes') }},
     left({{ ident('tipo_prestamo') }}, 2) as {{ ident('tipo_prestamo') }},
     left({{ ident('codigo_recurso') }}, 2) as {{ ident('codigo_recurso') }},
-    format_date('%Y-%m-%d', cast({{ ident('ultima_fecha_venc') }} as date)) as {{ ident('ultima_fecha_venc') }},
-    cast({{ ident('dias_prorroga') }} as string) as {{ ident('dias_prorroga') }},
+    to_char( cast({{ ident('ultima_fecha_venc') }} as date), 'YYYY-MM-DD') as {{ ident('ultima_fecha_venc') }},
+    cast({{ ident('dias_prorroga') }} as text) as {{ ident('dias_prorroga') }},
     format('%.2f', round({{ ident('monto_desembolsado') }}, 2)) as {{ ident('monto_desembolsado') }},
     left({{ ident('tipo_credito') }}, 2) as {{ ident('tipo_credito') }},
-    format_date(
-        '%Y-%m-%d', cast({{ ident('fecha_ultimo_pago_k') }} as date)
+    to_char(
+        'YYYY-MM-DD', cast({{ ident('fecha_ultimo_pago_k') }} as date)
     ) as {{ ident('fecha_ultimo_pago_k') }},
-    format_date(
-        '%Y-%m-%d', cast({{ ident('fecha_ultimo_pago_i') }} as date)
+    to_char(
+        'YYYY-MM-DD', cast({{ ident('fecha_ultimo_pago_i') }} as date)
     ) as {{ ident('fecha_ultimo_pago_i') }},
-    cast({{ ident('dia_pago_k') }} as string) as {{ ident('dia_pago_k') }},
-    cast({{ ident('dia_pago_i') }} as string) as {{ ident('dia_pago_i') }},
-    cast({{ ident('cuota_mora_k') }} as string) as {{ ident('cuota_mora_k') }},
-    cast({{ ident('cuota_mora_i') }} as string) as {{ ident('cuota_mora_i') }},
+    cast({{ ident('dia_pago_k') }} as text) as {{ ident('dia_pago_k') }},
+    cast({{ ident('dia_pago_i') }} as text) as {{ ident('dia_pago_i') }},
+    cast({{ ident('cuota_mora_k') }} as text) as {{ ident('cuota_mora_k') }},
+    cast({{ ident('cuota_mora_i') }} as text) as {{ ident('cuota_mora_i') }},
     format('%.2f', round({{ ident('monto_cuota') }}, 2)) as {{ ident('monto_cuota') }},
     left({{ ident('cuenta_contable_k') }}, 12) as {{ ident('cuenta_contable_k') }},
     left({{ ident('cuenta_contable_i') }}, 12) as {{ ident('cuenta_contable_i') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_cancelacion') }} as date)) as {{ ident('fecha_cancelacion') }},
+    to_char( cast({{ ident('fecha_cancelacion') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_cancelacion') }},
     format('%.2f', round({{ ident('adelanto_capital') }}, 2)) as {{ ident('adelanto_capital') }},
     format('%.2f', round({{ ident('riesgo_neto') }}, 2)) as {{ ident('riesgo_neto') }},
     format('%.2f', round({{ ident('saldo_seguro') }}, 2)) as {{ ident('saldo_seguro') }},
@@ -69,14 +69,14 @@ select
     left({{ ident('distrito_otorgamiento') }}, 4) as {{ ident('distrito_otorgamiento') }},
     format('%.2f', round({{ ident('reserva_referencia') }}, 2)) as {{ ident('reserva_referencia') }},
     left({{ ident('etapa_judicial') }}, 1) as {{ ident('etapa_judicial') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_demanda') }} as date)) as {{ ident('fecha_demanda') }},
-    cast({{ ident('plazo_credito') }} as string) as {{ ident('plazo_credito') }},
+    to_char( cast({{ ident('fecha_demanda') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_demanda') }},
+    cast({{ ident('plazo_credito') }} as text) as {{ ident('plazo_credito') }},
     left({{ ident('orden_descuento') }}, 2) as {{ ident('orden_descuento') }},
     left({{ ident('categoria_riesgo_ref') }}, 2) as {{ ident('categoria_riesgo_ref') }},
     format('%.2f', round({{ ident('reserva_constituir') }}, 2)) as {{ ident('reserva_constituir') }},
     format('%.2f', round({{ ident('porcentaje_reserva') }}, 2)) as {{ ident('porcentaje_reserva') }},
     format('%.2f', round({{ ident('pago_cuota') }}, 2)) as {{ ident('pago_cuota') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_pago') }} as date)) as {{ ident('fecha_pago') }},
+    to_char( cast({{ ident('fecha_pago') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_pago') }},
     format('%.2f', round({{ ident('porcenta_reserva_descon') }}, 2)) as {{ ident('porcenta_reserva_descon') }},
     format('%.2f', round({{ ident('porcenta_adiciona_descon') }}, 2)) as {{ ident('porcenta_adiciona_descon') }},
     left({{ ident('depto_destino_credito') }}, 2) as {{ ident('depto_destino_credito') }},
@@ -84,5 +84,5 @@ select
     format('%.2f', round({{ ident('calculo_brecha') }}, 2)) as {{ ident('calculo_brecha') }},
     format('%.2f', round({{ ident('ajuste_brecha') }}, 2)) as {{ ident('ajuste_brecha') }},
     left({{ ident('programa_asist_cafe') }}, 2) as {{ ident('programa_asist_cafe') }},
-    format_date('%Y-%m-%d', cast({{ ident('fecha_cump_cafe') }} as date)) as {{ ident('fecha_cump_cafe') }}
+    to_char( cast({{ ident('fecha_cump_cafe') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_cump_cafe') }}
 from {{ ref("int_nrp_41_02_referencia") }}

@@ -66,11 +66,11 @@ with
             "Cuenta Corriente" as clasecuentapo,
             wer.reference as conceptotransaccionpo,
             wer.amount_usd as valorotrosmedioselectronicospo,
-            cast(null as string) as numeroproductopb,
-            cast(null as string) as clasecuentapb,
+            cast(null as text) as numeroproductopb,
+            cast(null as text) as clasecuentapb,
             wer.amount_usd as montotransaccionpb,
             wer.amount_usd as valormedioelectronicopb,
-            cast(null as string) as bancocuentadestinatariapb
+            cast(null as text) as bancocuentadestinatariapb
         from int_core_withdrawal_events_rollup wer
         inner join relevant_withdrawals rw on wer.withdrawal_id = rw.withdrawal_id
         left join
@@ -101,15 +101,15 @@ with
             null as detallespersonaa,
             cast(null as integer) as tipopersonab,
             null as detallespersonab,
-            cast(null as string) as numerocuentapo,
-            cast(null as string) as clasecuentapo,
+            cast(null as text) as numerocuentapo,
+            cast(null as text) as clasecuentapo,
             der.reference as conceptotransaccionpo,
             der.amount_usd as valorotrosmedioselectronicospo,
             aer.public_id as numeroproductopb,
             "Cuenta Corriente" as clasecuentapb,
             der.amount_usd as montotransaccionpb,
             der.amount_usd as valormedioelectronicopb,
-            cast(null as string) as bancocuentadestinatariapb
+            cast(null as text) as bancocuentadestinatariapb
         from int_core_deposit_events_rollup der
         inner join relevant_deposits rd on der.deposit_id = rd.deposit_id
         left join deposit_confirmation_timestamps dct on der.deposit_id = dct.deposit_id

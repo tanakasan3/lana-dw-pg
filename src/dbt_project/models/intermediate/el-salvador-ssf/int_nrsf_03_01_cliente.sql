@@ -17,17 +17,17 @@ with
 
 select
     customer_public_ids.id as `NIU`,
-    split(first_name, ' ')[safe_offset(0)] as `Primer Nombre`,
-    split(first_name, ' ')[safe_offset(1)] as `Segundo Nombre`,
-    cast(null as string) as `Tercer Nombre`,
-    split(last_name, ' ')[safe_offset(0)] as `Primer Apellido`,
-    split(last_name, ' ')[safe_offset(1)] as `Segundo Apellido`,
+    split(first_name, ' ')[0 + 1] as `Primer Nombre`,
+    split(first_name, ' ')[1 + 1] as `Segundo Nombre`,
+    cast(null as text) as `Tercer Nombre`,
+    split(last_name, ' ')[0 + 1] as `Primer Apellido`,
+    split(last_name, ' ')[1 + 1] as `Segundo Apellido`,
     married_name as `Apellido de casada`,
-    cast(null as string) as `Razón social`,
+    cast(null as text) as `Razón social`,
     '1' as `Tipo de persona`,
-    cast(nationality_code as string) as `Nacionalidad`,
-    cast(economic_activity_code as string) as `Actividad Económica`,
-    cast(country_of_residence_code as string) as `País de Residencia`,
+    cast(nationality_code as text) as `Nacionalidad`,
+    cast(economic_activity_code as text) as `Actividad Económica`,
+    cast(country_of_residence_code as text) as `País de Residencia`,
     '15' as `Departamento`,
     '00' as `Distrito`,
     formatted_address as `Dirección`,
@@ -42,7 +42,7 @@ select
     '{{ npb4_17_03_tipos_de_categorias_de_riesgo("Deudores normales") }}'
     as `Clasificación de Riesgo`,
     relationship_to_bank as `Tipo de relación`,
-    cast(null as string) as `Agencia`,
+    cast(null as text) as `Agencia`,
     least(
         sum_total_collateral_amount_usd, {{ var("deposits_coverage_limit") }}
     ) as `Saldo garantizado`

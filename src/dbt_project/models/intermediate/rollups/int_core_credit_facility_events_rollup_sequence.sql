@@ -104,12 +104,8 @@ with
             is_completed,
 
             interest_accrual_cycle_idx,
-            parse_timestamp(
-                "%Y-%m-%dT%H:%M:%E*SZ", json_value(interest_period, "$.start")
-            ) as interest_period_start_at,
-            parse_timestamp(
-                "%Y-%m-%dT%H:%M:%E*SZ", json_value(interest_period, "$.end")
-            ) as interest_period_end_at,
+            cast(json_value(interest_period, '$.start') as timestamp) as interest_period_start_at,
+            cast(json_value(interest_period, '$.end') as timestamp) as interest_period_end_at,
             json_value(
                 interest_period, "$.interval.type"
             ) as interest_period_interval_type,

@@ -19,11 +19,11 @@ select
     left(`Correo electrónico`, 50) as `Correo electrónico`,
     left(`Es residente`, 1) as `Es residente`,
     left(`Tipo de sector`, 1) as `Tipo de sector`,
-    format_date('%Y%m%d', cast(`Fecha de Nacimiento` as date)) as `Fecha de Nacimiento`,
+    to_char( cast(`Fecha de Nacimiento` as date), 'YYYY-MM-DD') as `Fecha de Nacimiento`,
     left(`Género`, 1) as `Género`,
     left(`Estado civil`, 1) as `Estado civil`,
     left(`Clasificación de Riesgo`, 2) as `Clasificación de Riesgo`,
     left(`Tipo de relación`, 1) as `Tipo de relación`,
     left(`Agencia`, 7) as `Agencia`,
-    cast(round(`Saldo garantizado`, 2) as string) as `Saldo garantizado`
+    cast(round(`Saldo garantizado`, 2) as text) as `Saldo garantizado`
 from {{ ref("int_nrsf_03_01_cliente") }}
