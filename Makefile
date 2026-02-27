@@ -7,8 +7,10 @@ help:
 	@echo "lana-dw-pg - Standalone Dagster pipeline for lana-bank"
 	@echo ""
 	@echo "Docker:"
-	@echo "  make up              Start with built-in postgres (default)"
-	@echo "  make up-external     Start without built-in postgres (external PG)"
+	@echo "  make up                        Start with built-in postgres (default)"
+	@echo "  make up-external               Start with external postgres"
+	@echo "  make up-external-container     Auto-detect container IP (CONTAINER=name)"
+	@echo "  make get-container-ip          Print container IP (CONTAINER=name)"
 	@echo "  make down            Stop all services"
 	@echo "  make restart         Restart all services"
 	@echo "  make logs            Tail logs from all services"
@@ -47,6 +49,24 @@ up:
 # Start with external postgres (no lana-dw-postgres container)
 up-external:
 	docker compose --profile external up -d
+
+# Start with external postgres, auto-detecting container IP
+# Usage: make up-external-container CONTAINER=core-pg
+up-external-container:
+ifndef CONTAINER
+	$(error CONTAINER is required. Usage: make up-external-container CONTAINER=core-pg)
+endif
+	$(eval DST_IP := $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CONTAINER)))
+	@echo "Detected $(CONTAINER) IP: $(DST_IP)"
+	DST_PG_HOST=$(DST_IP) docker compose --profile external up -d
+
+# Get a container's IP address
+# Usage: make get-container-ip CONTAINER=core-pg
+get-container-ip:
+ifndef CONTAINER
+	$(error CONTAINER is required. Usage: make get-container-ip CONTAINER=core-pg)
+endif
+	@docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CONTAINER)
 
 down:
 	docker compose --profile external down
