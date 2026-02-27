@@ -22,5 +22,5 @@ select
     column_cfg.eng_column_title
 from titles
 left join
-    column_cfg on column_cfg.eng_column_title = "Non-controlling shareholders' shares"
+    column_cfg on column_cfg.eng_column_title = 'Non-controlling shareholders'' shares'
 order by order_by

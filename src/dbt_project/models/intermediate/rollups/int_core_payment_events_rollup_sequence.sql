@@ -17,8 +17,8 @@ with
             cast(0 as numeric) / {{ var("cents_per_usd") }} as disbursal_usd,
             created_at as payment_created_at,
             modified_at as payment_modified_at,
-
-            * except (payment_id, credit_facility_id, amount, created_at, modified_at)
+            version,
+            loaded_to_dw_at
         from source
     )
 

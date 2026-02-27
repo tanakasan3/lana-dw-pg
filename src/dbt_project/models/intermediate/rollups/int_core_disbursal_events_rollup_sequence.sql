@@ -23,23 +23,14 @@ with
             liquidation_date,
             created_at as disbursal_created_at,
             modified_at as disbursal_modified_at,
-
-            * except (
-                disbursal_id,
-                credit_facility_id,
-
-                effective,
-                amount,
-                approved,
-                is_approval_process_concluded,
-                is_settled,
-                is_cancelled,
-                due_date,
-                overdue_date,
-                liquidation_date,
-                created_at,
-                modified_at
-            )
+            version,
+            account_ids,
+            approval_process_id,
+            disbursal_credit_account_id,
+            obligation_id,
+            public_id,
+            ledger_tx_ids,
+            loaded_to_dw_at
         from source
     )
 

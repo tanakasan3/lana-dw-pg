@@ -12,7 +12,18 @@ with
 
     transformed as (
         select
-            * except (credit_facility_proposal_id, version),
+            created_at,
+            modified_at,
+            amount,
+            approval_process_id,
+            custodian_id,
+            customer_id,
+            customer_type,
+            disbursal_credit_account_id,
+            status,
+            terms,
+            is_approval_process_concluded,
+            loaded_to_dw_at,
             credit_facility_proposal_id,
             version
         from source

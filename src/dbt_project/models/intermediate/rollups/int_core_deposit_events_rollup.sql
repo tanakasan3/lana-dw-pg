@@ -1,6 +1,6 @@
 with
     latest_sequence as (
-        select deposit_id, max(version) as version,
+        select deposit_id, max(version) as version
         from {{ ref("int_core_deposit_events_rollup_sequence") }}
         group by deposit_id
     ),

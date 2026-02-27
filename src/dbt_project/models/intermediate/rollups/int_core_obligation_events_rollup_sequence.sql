@@ -24,8 +24,8 @@ with
             cast(defaulted_amount as numeric)
             / {{ var("cents_per_usd") }} as defaulted_amount_usd,
 
-            current_timestamp() >= due_date
-            and current_timestamp() >= overdue_date
+            current_timestamp >= due_date
+            and current_timestamp >= overdue_date
             and not is_completed
             and not is_defaulted_recorded
             and cast(amount as numeric) > 0 as overdue,
@@ -37,7 +37,7 @@ with
                 then 0
                 else 1
             end * greatest(
-                timestamp_diff(current_timestamp(), overdue_date, day), 0
+                extract(day from current_timestamp - overdue_date)::integer, 0
             ) as overdue_days,
 
             due_date,
@@ -50,29 +50,14 @@ with
             is_completed,
             created_at as obligation_created_at,
             modified_at as obligation_modified_at,
-
-            * except (
-                obligation_id,
-                credit_facility_id,
-
-                effective,
-                obligation_type,
-                amount,
-                payment_allocation_amount,
-                due_amount,
-                overdue_amount,
-                defaulted_amount,
-                due_date,
-                overdue_date,
-                liquidation_date,
-                defaulted_date,
-                is_due_recorded,
-                is_overdue_recorded,
-                is_defaulted_recorded,
-                is_completed,
-                created_at,
-                modified_at
-            )
+            version,
+            defaulted_account_id,
+            payment_id,
+            reference,
+            ledger_tx_ids,
+            payment_allocation_ids,
+            receivable_account_ids,
+            loaded_to_dw_at
         from source
     )
 

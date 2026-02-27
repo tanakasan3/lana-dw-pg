@@ -24,21 +24,9 @@ with
             obligation_id,
             created_at as payment_allocation_created_at,
             modified_at as payment_allocation_modified_at,
-
-            * except (
-                payment_allocation_id,
-                payment_id,
-                credit_facility_id,
-                amount,
-                effective,
-                obligation_type,
-                payment_allocation_idx,
-                payment_holding_account_id,
-                receivable_account_id,
-                obligation_id,
-                created_at,
-                modified_at
-            )
+            version,
+            ledger_tx_id,
+            loaded_to_dw_at
         from source
     )
 
