@@ -91,32 +91,29 @@ clean:
 # Dagster Materialization (via dagster CLI in container)
 # =============================================================================
 
+# Dagster CLI base command
+DAGSTER_CLI = docker exec dagster-code-location dagster asset materialize \
+	-f /lana-dw-pg/src/definitions.py \
+	-d /lana-dw-pg
+
 # Run all Lana EL jobs (source PG -> raw schema)
 materialize-el:
-	docker exec dagster-code-location dagster asset materialize \
-		-f /lana-dw-pg/src/definitions.py \
-		--select 'lana/*'
+	$(DAGSTER_CLI) --select 'lana/*'
 
 # Run dbt seeds
 materialize-seeds:
-	docker exec dagster-code-location dagster asset materialize \
-		-f /lana-dw-pg/src/definitions.py \
-		--select 'dbt_lana_dw/seeds/*'
+	$(DAGSTER_CLI) --select 'dbt_lana_dw/seeds/*'
 
 # Run dbt models (raw -> dbt schema)
 materialize-dbt:
-	docker exec dagster-code-location dagster asset materialize \
-		-f /lana-dw-pg/src/definitions.py \
-		--select 'dbt_lana_dw/*'
+	$(DAGSTER_CLI) --select 'dbt_lana_dw/*'
 
 # Run everything: EL + seeds + dbt
 materialize-all: materialize-el materialize-seeds materialize-dbt
 
 # Run Bitfinex EL jobs
 materialize-bitfinex:
-	docker exec dagster-code-location dagster asset materialize \
-		-f /lana-dw-pg/src/definitions.py \
-		--select 'bitfinex/*'
+	$(DAGSTER_CLI) --select 'bitfinex/*'
 
 # =============================================================================
 # Database - Destination PG
