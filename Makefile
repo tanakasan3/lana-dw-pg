@@ -19,11 +19,12 @@ help:
 	@echo "  make clean           Stop and remove volumes"
 	@echo ""
 	@echo "Dagster Materialization:"
-	@echo "  make materialize-el      Run EL (lana source -> raw schema)"
-	@echo "  make materialize-seeds   Run dbt seeds"
-	@echo "  make materialize-dbt     Run dbt models"
-	@echo "  make materialize-all     Run all (EL + seeds + dbt)"
+	@echo "  make materialize-el        Run EL (lana source -> raw schema)"
+	@echo "  make materialize-seeds     Run dbt seeds"
+	@echo "  make materialize-dbt       Run dbt models"
+	@echo "  make materialize-all       Run all (EL + seeds + dbt)"
 	@echo "  make materialize-bitfinex  Run Bitfinex EL jobs"
+	@echo "  make materialize-sumsub    Run Sumsub EL (needs SUMSUB_KEY/SECRET)"
 	@echo ""
 	@echo "Database:"
 	@echo "  make psql            Connect to destination PG"
@@ -116,6 +117,10 @@ materialize-bitfinex:
 	$(DAGSTER_JOB) -j bitfinex_ticker_el
 	$(DAGSTER_JOB) -j bitfinex_trades_el
 	$(DAGSTER_JOB) -j bitfinex_order_book_el
+
+# Run Sumsub applicants EL (requires SUMSUB_KEY and SUMSUB_SECRET env vars)
+materialize-sumsub:
+	$(DAGSTER_JOB) -j sumsub_applicants_el
 
 # =============================================================================
 # Database - Destination PG
