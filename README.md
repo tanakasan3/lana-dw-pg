@@ -58,11 +58,24 @@ Standalone Dagster data pipeline for lana-bank, targeting PostgreSQL only.
 ### Using Docker Compose
 
 ```bash
-# Start all services (uses single PG for source + destination)
-docker compose up -d
+# Default mode: with built-in postgres
+make up
+# or: docker compose up -d
 
-# Or with separate source database
-docker compose -f docker-compose.yml -f docker-compose.external-source.yml up -d
+# External mode: use your own postgres (no lana-dw-postgres container)
+export PG_CON="postgres://user:pass@your-source:5432/lana"
+export DST_PG_HOST="your-dest-host"
+export DST_PG_PORT="5432"
+export DST_PG_DATABASE="lana_dw"
+export DST_PG_USER="postgres"
+export DST_PG_PASSWORD="secret"
+
+# Create schemas on external PG first
+make init-schemas
+
+# Start without built-in postgres
+make up-external
+# or: docker compose --profile external up -d
 ```
 
 ### Local Development

@@ -1,81 +1,100 @@
 # lana-dw-pg: Standalone Dagster pipeline for PostgreSQL
 #
-# Default mode: All-in-one PostgreSQL (source in public, raw + dbt schemas)
-# For external source: set PG_CON to point to your lana-bank instance
+# USAGE:
+#   make up                  - Start with built-in postgres (default)
+#   make up-external         - Start without built-in postgres (use external PG)
+#
+# Or directly:
+#   docker compose up -d                      - With built-in postgres
+#   docker compose --profile external up -d   - Without built-in postgres
+#
+# For external PG, set these env vars in .env or shell:
+#   PG_CON, DST_PG_HOST, DST_PG_PORT, DST_PG_DATABASE, DST_PG_USER, DST_PG_PASSWORD
 
 x-hostgw: &hostgw
   extra_hosts:
     - "host.containers.internal:host-gateway"
 
 x-dest-pg-env: &dest-pg-env
-  DST_PG_HOST: lana-dw-postgres
-  DST_PG_PORT: "5432"
-  DST_PG_DATABASE: lana_dw
-  DST_PG_USER: postgres
-  DST_PG_PASSWORD: postgres
-  DST_RAW_SCHEMA: raw
-  DST_DBT_SCHEMA: dbt
+  DST_PG_HOST: ${DST_PG_HOST:-lana-dw-postgres}
+  DST_PG_PORT: ${DST_PG_PORT:-5432}
+  DST_PG_DATABASE: ${DST_PG_DATABASE:-lana_dw}
+  DST_PG_USER: ${DST_PG_USER:-postgres}
+  DST_PG_PASSWORD: ${DST_PG_PASSWORD:-postgres}
+  DST_RAW_SCHEMA: ${DST_RAW_SCHEMA:-raw}
+  DST_DBT_SCHEMA: ${DST_DBT_SCHEMA:-dbt}
+
+x-dagster-env: &dagster-env
+  DAGSTER_POSTGRES_HOST: dagster-postgres
+  DAGSTER_POSTGRES_USER: dagster
+  DAGSTER_POSTGRES_PASSWORD: dagster
+  DAGSTER_POSTGRES_DB: dagster
+
+x-code-location-base: &code-location-base
+  <<: *hostgw
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: lana-dw-pg:latest
+  container_name: dagster-code-location
+  restart: always
 
 services:
-  # PostgreSQL for Data Warehouse (raw + dbt schemas)
-  # In all-in-one mode, also holds source tables in public schema
+  # ==========================================================================
+  # Built-in PostgreSQL (default profile)
+  # ==========================================================================
+
+  # Data warehouse postgres (raw + dbt schemas)
   lana-dw-postgres:
     image: postgres:15
     container_name: lana-dw-postgres
+    profiles: ["default", ""]
     environment:
-      POSTGRES_DB: lana_dw
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${DST_PG_DATABASE:-lana_dw}
+      POSTGRES_USER: ${DST_PG_USER:-postgres}
+      POSTGRES_PASSWORD: ${DST_PG_PASSWORD:-postgres}
     ports:
-      - "5433:5432"
+      - "${DST_PG_PORT_EXPOSE:-5433}:5432"
     volumes:
       - lana-dw-postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d lana_dw"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DST_PG_DATABASE:-lana_dw}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  # Init container to create schemas
+  # Init schemas (only with built-in postgres)
   lana-dw-init:
     image: postgres:15
     container_name: lana-dw-init
+    profiles: ["default", ""]
     depends_on:
       lana-dw-postgres:
         condition: service_healthy
     environment:
       PGHOST: lana-dw-postgres
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      PGDATABASE: lana_dw
+      PGUSER: ${DST_PG_USER:-postgres}
+      PGPASSWORD: ${DST_PG_PASSWORD:-postgres}
+      PGDATABASE: ${DST_PG_DATABASE:-lana_dw}
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        psql -c "CREATE SCHEMA IF NOT EXISTS raw;"
-        psql -c "CREATE SCHEMA IF NOT EXISTS dbt;"
-        echo "Schemas created: raw, dbt"
+        psql -c "CREATE SCHEMA IF NOT EXISTS ${DST_RAW_SCHEMA:-raw};"
+        psql -c "CREATE SCHEMA IF NOT EXISTS ${DST_DBT_SCHEMA:-dbt};"
+        echo "Schemas created: ${DST_RAW_SCHEMA:-raw}, ${DST_DBT_SCHEMA:-dbt}"
     restart: "no"
 
-  # Dagster code location (gRPC server)
+  # ==========================================================================
+  # Dagster Code Location
+  # ==========================================================================
+
+  # Default mode: depends on built-in postgres
   dagster-code-location:
-    <<: *hostgw
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: lana-dw-pg:latest
-    container_name: dagster-code-location
-    restart: always
+    <<: *code-location-base
+    profiles: ["default", ""]
     environment:
-      <<: *dest-pg-env
-      # Source connection - defaults to same DB (all-in-one mode)
-      # Override PG_CON to point to external lana-bank instance
+      <<: [*dest-pg-env, *dagster-env]
       PG_CON: ${PG_CON:-postgres://postgres:postgres@lana-dw-postgres:5432/lana_dw}
-      # Dagster metadata
-      DAGSTER_POSTGRES_HOST: dagster-postgres
-      DAGSTER_POSTGRES_USER: dagster
-      DAGSTER_POSTGRES_PASSWORD: dagster
-      DAGSTER_POSTGRES_DB: dagster
-      # Optional
       DAGSTER_AUTOMATIONS_ACTIVE: ${DAGSTER_AUTOMATIONS_ACTIVE:-}
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
       SUMSUB_KEY: ${SUMSUB_KEY:-}
@@ -86,11 +105,28 @@ services:
       lana-dw-init:
         condition: service_completed_successfully
 
-  # Dagster webserver
+  # External mode: no postgres dependency, requires env vars
+  dagster-code-location-external:
+    <<: *code-location-base
+    profiles: ["external"]
+    environment:
+      <<: [*dest-pg-env, *dagster-env]
+      PG_CON: ${PG_CON:?PG_CON is required for external mode}
+      DAGSTER_AUTOMATIONS_ACTIVE: ${DAGSTER_AUTOMATIONS_ACTIVE:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      SUMSUB_KEY: ${SUMSUB_KEY:-}
+      SUMSUB_SECRET: ${SUMSUB_SECRET:-}
+
+  # ==========================================================================
+  # Dagster Webserver & Daemon
+  # ==========================================================================
+
+  # Webserver (default profile)
   dagster-webserver:
     build:
       context: .
       dockerfile: Dockerfile.dagster
+    profiles: ["default", ""]
     entrypoint:
       - dagster-webserver
       - -h
@@ -103,10 +139,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DAGSTER_POSTGRES_HOST: dagster-postgres
-      DAGSTER_POSTGRES_USER: dagster
-      DAGSTER_POSTGRES_PASSWORD: dagster
-      DAGSTER_POSTGRES_DB: dagster
+      <<: *dagster-env
     volumes:
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     depends_on:
@@ -115,22 +148,47 @@ services:
       dagster-code-location:
         condition: service_started
 
-  # Dagster daemon (schedules, sensors)
+  # Webserver (external profile)
+  dagster-webserver-external:
+    build:
+      context: .
+      dockerfile: Dockerfile.dagster
+    profiles: ["external"]
+    entrypoint:
+      - dagster-webserver
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    container_name: dagster-webserver
+    ports:
+      - "3000:3000"
+    environment:
+      <<: *dagster-env
+    volumes:
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    depends_on:
+      dagster-postgres:
+        condition: service_started
+      dagster-code-location-external:
+        condition: service_started
+
+  # Daemon (default profile)
   dagster-daemon:
     <<: *hostgw
     build:
       context: .
       dockerfile: Dockerfile.dagster
+    profiles: ["default", ""]
     entrypoint:
       - dagster-daemon
       - run
     container_name: dagster-daemon
     restart: on-failure
     environment:
-      DAGSTER_POSTGRES_HOST: dagster-postgres
-      DAGSTER_POSTGRES_USER: dagster
-      DAGSTER_POSTGRES_PASSWORD: dagster
-      DAGSTER_POSTGRES_DB: dagster
+      <<: *dagster-env
     volumes:
       - /tmp/io_manager_storage:/tmp/io_manager_storage
     depends_on:
@@ -139,7 +197,32 @@ services:
       dagster-code-location:
         condition: service_started
 
-  # Dagster metadata database
+  # Daemon (external profile)
+  dagster-daemon-external:
+    <<: *hostgw
+    build:
+      context: .
+      dockerfile: Dockerfile.dagster
+    profiles: ["external"]
+    entrypoint:
+      - dagster-daemon
+      - run
+    container_name: dagster-daemon
+    restart: on-failure
+    environment:
+      <<: *dagster-env
+    volumes:
+      - /tmp/io_manager_storage:/tmp/io_manager_storage
+    depends_on:
+      dagster-postgres:
+        condition: service_started
+      dagster-code-location-external:
+        condition: service_started
+
+  # ==========================================================================
+  # Dagster Metadata Database (always needed)
+  # ==========================================================================
+
   dagster-postgres:
     image: postgres:15
     container_name: dagster-postgres

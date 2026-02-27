@@ -1,13 +1,14 @@
-.PHONY: help up down restart logs build clean \
+.PHONY: help up up-external down restart logs build clean \
         materialize-el materialize-seeds materialize-dbt materialize-all \
-        psql psql-schemas psql-tables psql-raw psql-dbt
+        psql psql-schemas psql-tables psql-raw psql-dbt init-schemas
 
 # Default target
 help:
 	@echo "lana-dw-pg - Standalone Dagster pipeline for lana-bank"
 	@echo ""
 	@echo "Docker:"
-	@echo "  make up              Start all services"
+	@echo "  make up              Start with built-in postgres (default)"
+	@echo "  make up-external     Start without built-in postgres (external PG)"
 	@echo "  make down            Stop all services"
 	@echo "  make restart         Restart all services"
 	@echo "  make logs            Tail logs from all services"
@@ -29,16 +30,26 @@ help:
 	@echo "  make psql-raw        List tables in raw schema"
 	@echo "  make psql-dbt        List tables in dbt schema"
 	@echo "  make psql-source     Connect to source PG (if separate)"
+	@echo "  make init-schemas    Create raw/dbt schemas on external PG"
+	@echo ""
+	@echo "External PG mode requires these env vars:"
+	@echo "  PG_CON, DST_PG_HOST, DST_PG_PORT, DST_PG_DATABASE, DST_PG_USER, DST_PG_PASSWORD"
 	@echo ""
 
 # =============================================================================
 # Docker
 # =============================================================================
 
+# Start with built-in postgres (default)
 up:
 	docker compose up -d
 
+# Start with external postgres (no lana-dw-postgres container)
+up-external:
+	docker compose --profile external up -d
+
 down:
+	docker compose --profile external down
 	docker compose down
 
 restart: down up
@@ -53,6 +64,7 @@ build:
 	docker compose build
 
 clean:
+	docker compose --profile external down -v
 	docker compose down -v
 
 # =============================================================================
@@ -145,6 +157,12 @@ psql-raw-counts:
 			WHERE table_schema = '$(DST_RAW_SCHEMA)' \
 		) t \
 		ORDER BY table_name;"
+
+# Initialize schemas on external PG (for external mode)
+init-schemas:
+	@$(PSQL_CMD) -c "CREATE SCHEMA IF NOT EXISTS $(DST_RAW_SCHEMA);"
+	@$(PSQL_CMD) -c "CREATE SCHEMA IF NOT EXISTS $(DST_DBT_SCHEMA);"
+	@echo "Schemas created: $(DST_RAW_SCHEMA), $(DST_DBT_SCHEMA)"
 
 # =============================================================================
 # Database - Source PG (if using external source)
