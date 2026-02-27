@@ -7,10 +7,10 @@ seeds:
       Contains account mappings stored as JSON arrays to be parsed by wrapper model.
     config:
       column_types:
-        order_by: INT64
-        title: STRING
-        eng_title: STRING
-        source_account_codes: STRING
+        order_by: BIGINT
+        title: TEXT
+        eng_title: TEXT
+        source_account_codes: TEXT
     columns:
       - name: order_by
         description: Display order for the line item
@@ -30,10 +30,10 @@ seeds:
       Contains account mappings stored as JSON arrays to be parsed by wrapper model.
     config:
       column_types:
-        order_by: INT64
-        title: STRING
-        eng_title: STRING
-        source_account_spaced_codes: STRING
+        order_by: BIGINT
+        title: TEXT
+        eng_title: TEXT
+        source_account_spaced_codes: TEXT
     columns:
       - name: order_by
         description: Display order for the line item
@@ -53,9 +53,9 @@ seeds:
       Defines the 10 columns for changes in equity reporting.
     config:
       column_types:
-        column_order_by: INT64
-        column_title: STRING
-        eng_column_title: STRING
+        column_order_by: BIGINT
+        column_title: TEXT
+        eng_column_title: TEXT
     columns:
       - name: column_order_by
         description: Display order for the column
@@ -75,10 +75,10 @@ seeds:
       Used by column wrapper models to generate equity statement configurations.
     config:
       column_types:
-        order_by: INT64
-        title: STRING
-        eng_title: STRING
-        source_account_codes: STRING
+        order_by: BIGINT
+        title: TEXT
+        eng_title: TEXT
+        source_account_codes: TEXT
     columns:
       - name: order_by
         description: Display order for the row
@@ -98,10 +98,10 @@ seeds:
       Contains operating, investing, and financing activity line items.
     config:
       column_types:
-        order_by: INT64
-        title: STRING
-        eng_title: STRING
-        source_account_codes: STRING
+        order_by: BIGINT
+        title: TEXT
+        eng_title: TEXT
+        source_account_codes: TEXT
     columns:
       - name: order_by
         description: Display order for the line item
@@ -121,11 +121,11 @@ seeds:
       Defines deposit categories and their reserve calculation rules.
     config:
       column_types:
-        order_by: INT64
-        title: STRING
-        eng_title: STRING
-        sum_account_codes: STRING
-        diff_account_codes: STRING
+        order_by: BIGINT
+        title: TEXT
+        eng_title: TEXT
+        sum_account_codes: TEXT
+        diff_account_codes: TEXT
     columns:
       - name: order_by
         description: Display order for the line item
@@ -147,9 +147,9 @@ seeds:
       Maps account codes to their required liquidity reserve percentages.
     config:
       column_types:
-        account_code: STRING
-        account_name: STRING
-        eng_account_name: STRING
+        account_code: TEXT
+        account_name: TEXT
+        eng_account_name: TEXT
         coefficient: BIGNUMERIC
     columns:
       - name: account_code

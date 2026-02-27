@@ -7,10 +7,10 @@ seeds:
       for the calculation of Sanitation Reserves (Reservas de Saneamiento).
     config:
       column_types:
-        category: STRING
+        category: TEXT
         reserve_percentage: BIGNUMERIC
-        consumer_calendar_ge_days: INT64
-        consumer_calendar_le_days: INT64
+        consumer_calendar_ge_days: BIGINT
+        consumer_calendar_le_days: BIGINT
     columns:
       - name: category
         description: Risk category identifier (A1, A2, B, C1, C2, D1, D2, E)
@@ -32,10 +32,10 @@ seeds:
       Contains nationality names, country names in Spanish, and ISO Alpha-3 codes.
     config:
       column_types:
-        code: INT64
-        nationality: STRING
-        country: STRING
-        iso_alpha_3_code: STRING
+        code: BIGINT
+        nationality: TEXT
+        country: TEXT
+        iso_alpha_3_code: TEXT
     columns:
       - name: code
         description: Numeric country/territory code
@@ -59,12 +59,12 @@ seeds:
       Maps loan states between Spanish and English with calendar day thresholds.
     config:
       column_types:
-        estado: STRING
-        "explicación": STRING
-        status: STRING
-        explanation: STRING
-        consumer_calendar_ge_days: INT64
-        consumer_calendar_le_days: INT64
+        estado: TEXT
+        "explicación": TEXT
+        status: TEXT
+        explanation: TEXT
+        consumer_calendar_ge_days: BIGINT
+        consumer_calendar_le_days: BIGINT
     columns:
       - name: estado
         description: Loan status in Spanish
