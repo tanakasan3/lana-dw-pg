@@ -8,7 +8,7 @@ seeds:
     config:
       column_types:
         category: TEXT
-        reserve_percentage: BIGNUMERIC
+        reserve_percentage: NUMERIC
         consumer_calendar_ge_days: BIGINT
         consumer_calendar_le_days: BIGINT
     columns:

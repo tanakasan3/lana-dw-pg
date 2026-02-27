@@ -150,7 +150,7 @@ seeds:
         account_code: TEXT
         account_name: TEXT
         eng_account_name: TEXT
-        coefficient: BIGNUMERIC
+        coefficient: NUMERIC
     columns:
       - name: account_code
         description: Accounting system account code
