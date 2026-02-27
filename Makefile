@@ -44,11 +44,11 @@ help:
 
 # Start with built-in postgres (default)
 up:
-	docker compose up -d
+	docker compose up -d --build
 
 # Start with external postgres (no lana-dw-postgres container)
 up-external:
-	docker compose --profile external up -d
+	docker compose --profile external up -d --build
 
 # Start with external postgres, auto-detecting container IP
 # Usage: make up-external-container CONTAINER=core-pg
@@ -58,7 +58,7 @@ ifndef CONTAINER
 endif
 	$(eval DST_IP := $(shell docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(CONTAINER)))
 	@echo "Detected $(CONTAINER) IP: $(DST_IP)"
-	DST_PG_HOST=$(DST_IP) docker compose --profile external up -d
+	DST_PG_HOST=$(DST_IP) docker compose --profile external up -d --build
 
 # Get a container's IP address
 # Usage: make get-container-ip CONTAINER=core-pg
