@@ -94,20 +94,20 @@ clean:
 # Run all Lana EL jobs (source PG -> raw schema)
 materialize-el:
 	docker exec dagster-code-location dagster asset materialize \
-		--select 'lana/*' \
-		-d /lana-dw-pg
+		-f /lana-dw-pg/src/definitions.py \
+		--select 'lana/*'
 
 # Run dbt seeds
 materialize-seeds:
 	docker exec dagster-code-location dagster asset materialize \
-		--select 'dbt_lana_dw/seeds/*' \
-		-d /lana-dw-pg
+		-f /lana-dw-pg/src/definitions.py \
+		--select 'dbt_lana_dw/seeds/*'
 
 # Run dbt models (raw -> dbt schema)
 materialize-dbt:
 	docker exec dagster-code-location dagster asset materialize \
-		--select 'dbt_lana_dw/*' \
-		-d /lana-dw-pg
+		-f /lana-dw-pg/src/definitions.py \
+		--select 'dbt_lana_dw/*'
 
 # Run everything: EL + seeds + dbt
 materialize-all: materialize-el materialize-seeds materialize-dbt
@@ -115,8 +115,8 @@ materialize-all: materialize-el materialize-seeds materialize-dbt
 # Run Bitfinex EL jobs
 materialize-bitfinex:
 	docker exec dagster-code-location dagster asset materialize \
-		--select 'bitfinex/*' \
-		-d /lana-dw-pg
+		-f /lana-dw-pg/src/definitions.py \
+		--select 'bitfinex/*'
 
 # =============================================================================
 # Database - Destination PG
