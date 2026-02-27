@@ -2,6 +2,7 @@ FROM python:3.13-alpine
 
 # Logs show up immediately
 ENV PYTHONUNBUFFERED=1
+ENV DAGSTER_HOME=/opt/dagster/dagster_home
 
 # Install dependencies
 RUN apk --no-cache add \
@@ -57,6 +58,10 @@ RUN DST_PG_HOST=placeholder \
     DST_RAW_SCHEMA=raw \
     DST_DBT_SCHEMA=dbt \
     dbt parse --project-dir /lana-dw-pg/src/dbt_project --profiles-dir /lana-dw-pg/src/dbt_project
+
+# Setup DAGSTER_HOME for CLI commands
+RUN mkdir -p ${DAGSTER_HOME}
+COPY dagster.yaml workspace.yaml ${DAGSTER_HOME}/
 
 EXPOSE 4000
 
