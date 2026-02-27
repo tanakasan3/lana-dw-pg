@@ -7,7 +7,7 @@ with
 select
     cast(null as text) as {{ ident('id_codigo_banco') }},
     cast(null as text) as {{ ident('nom_banco') }},
-    cast(null as text) as `Pais`,
-    cast(null as text) as `Categoria`,
-    cast(null as numeric) as `Valor`
+    cast(null as text) as "Pais",
+    cast(null as text) as "Categoria",
+    cast(null as numeric) as "Valor"
 from final

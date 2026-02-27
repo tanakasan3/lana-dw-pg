@@ -19,19 +19,19 @@ with
     final as (select * from customers)
 
 select
-    7060 as `Correlativo`,
-    cast(null as text) as `Tercer Nombre`,
-    married_name as `Apellido de casada`,
-    cast(null as text) as `Razón social`,
-    'DUI' as `Código del Documento`,
-    dui as `Número de documento`,
-    7060.0 as `Total de cuentas`,
-    7060 as `Saldo de capital`,
-    0.0 as `Saldo de intereses`,
-    7060 as `Saldo garantizado`,
-    left(replace(customer_id, '-', ''), 14) as `NIU`,
-    split(first_name, ' ')[0 + 1] as `Primer Nombre`,
-    split(first_name, ' ')[1 + 1] as `Segundo Nombre`,
-    split(last_name, ' ')[0 + 1] as `Primer Apellido`,
-    split(last_name, ' ')[1 + 1] as `Segundo Apellido`
+    7060 as "Correlativo",
+    cast(null as text) as "Tercer Nombre",
+    married_name as "Apellido de casada",
+    cast(null as text) as "Razón social",
+    'DUI' as "Código del Documento",
+    dui as "Número de documento",
+    7060.0 as "Total de cuentas",
+    7060 as "Saldo de capital",
+    0.0 as "Saldo de intereses",
+    7060 as "Saldo garantizado",
+    left(replace(customer_id, '-', ''), 14) as "NIU",
+    split(first_name, ' ')[0 + 1] as "Primer Nombre",
+    split(first_name, ' ')[1 + 1] as "Segundo Nombre",
+    split(last_name, ' ')[0 + 1] as "Primer Apellido",
+    split(last_name, ' ')[1 + 1] as "Segundo Apellido"
 from final

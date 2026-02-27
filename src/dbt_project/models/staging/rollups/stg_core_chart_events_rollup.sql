@@ -28,7 +28,5 @@ select
     closed_as_of,
     name,
     reference,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_stg_core_chart_events_rollup

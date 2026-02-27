@@ -2,7 +2,7 @@ with
     dummy as (
 
         select
-            null as `Nombre`,
+            null as "Nombre",
             null as {{ ident('num_referencia') }},
             null as {{ ident('cod_cartera') }},
             null as {{ ident('cod_activo') }},

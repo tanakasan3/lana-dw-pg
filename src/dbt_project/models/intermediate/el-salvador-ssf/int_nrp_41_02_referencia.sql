@@ -118,8 +118,8 @@ select
         when accrual_cycle_interval = 'end_of_month'
         then '{{ npb4_17_08_formas_de_pago("Mensual") }}'
     end as {{ ident('pago_interes') }},
-    cast(null as int64) as {{ ident('periodo_gracia_k') }},
-    cast(null as int64) as {{ ident('periodo_gracia_i') }},
+    cast(null as bigint) as {{ ident('periodo_gracia_k') }},
+    cast(null as bigint) as {{ ident('periodo_gracia_i') }},
     cast(null as text) as {{ ident('garante') }},
     cast(null as text) as {{ ident('emisión') }},
 
@@ -161,8 +161,8 @@ select
     date(most_recent_capital_payment_timestamp) as {{ ident('fecha_ultimo_pago_i') }},
     extract(day from most_recent_interest_payment_timestamp) as {{ ident('dia_pago_k') }},
     extract(day from most_recent_capital_payment_timestamp) as {{ ident('dia_pago_i') }},
-    cast(null as int64) as {{ ident('cuota_mora_k') }},
-    cast(null as int64) as {{ ident('cuota_mora_i') }},
+    cast(null as bigint) as {{ ident('cuota_mora_k') }},
+    cast(null as bigint) as {{ ident('cuota_mora_i') }},
     cast(null as numeric) as {{ ident('monto_cuota') }},
 
     -- For bank loans, field must be equal to <<114>>

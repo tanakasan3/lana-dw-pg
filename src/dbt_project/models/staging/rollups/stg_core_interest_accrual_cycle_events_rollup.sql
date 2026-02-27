@@ -48,7 +48,5 @@ select
     tx_ref,
     ledger_tx_ids,
     is_interest_accruals_posted,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_stg_core_interest_accrual_cycle_events_rollup

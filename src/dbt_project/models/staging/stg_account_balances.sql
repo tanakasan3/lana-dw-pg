@@ -14,9 +14,7 @@ with
         select journal_id, account_id, currency, version, recorded_at,
         values
             ,
-            timestamp_micros(
-                cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-            ) as loaded_to_dw_at,
+            to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at,
             row_number() over (
                 partition by account_id order by _dlt_load_id desc
             ) as order_received_desc
@@ -25,7 +23,14 @@ with
 
     )
 
-select * except (order_received_desc)
+select 
+    journal_id, 
+    account_id, 
+    currency, 
+    version, 
+    recorded_at,
+    values,
+    loaded_to_dw_at
 
 from ordered
 

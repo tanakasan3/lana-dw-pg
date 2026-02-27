@@ -64,7 +64,5 @@ select
     is_due_recorded,
     is_overdue_recorded,
     receivable_account_ids,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_stg_core_obligation_events_rollup

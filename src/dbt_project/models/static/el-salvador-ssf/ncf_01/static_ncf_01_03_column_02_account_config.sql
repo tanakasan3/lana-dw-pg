@@ -5,9 +5,9 @@ with
             order_by,
             title,
             eng_title,
-            array(
-                select json_value(item, '$')
-                from unnest(json_query_array(source_account_codes, '$')) as item
+            (
+                select coalesce(array_agg(elem), ARRAY[]::text[])
+                from jsonb_array_elements_text(source_account_codes::jsonb) as elem
             ) as source_account_codes
         from {{ ref("static_ncf_01_03_row_titles_seed") }}
     ),

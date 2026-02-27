@@ -1,4 +1,25 @@
 {#
+  Cross-platform date/time functions.
+#}
+
+{#
+  timestamp_micros: Convert microseconds since epoch to timestamp.
+  
+  BigQuery: timestamp_micros(int64)
+  Postgres: to_timestamp(double precision)
+#}
+{% macro timestamp_micros(micros_expr) %}
+  {% if target.type == 'bigquery' %}
+    timestamp_micros({{ micros_expr }})
+  {%- elif target.type == 'postgres' %}
+    to_timestamp({{ micros_expr }}::double precision / 1000000.0)
+  {%- else %}
+    to_timestamp({{ micros_expr }}::double precision / 1000000.0)
+  {%- endif %}
+{% endmacro %}
+
+
+{#
   Cross-platform date formatting functions.
   
   BigQuery: to_char(format, date)

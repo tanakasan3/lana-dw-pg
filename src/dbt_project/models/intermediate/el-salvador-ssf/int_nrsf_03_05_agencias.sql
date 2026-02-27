@@ -19,10 +19,10 @@ with
     final as (select * from customers)
 
 select
-    'TODO' as `Código de la Agencia`,
-    'TODO' as `Nombre de la Agencia`,
-    'TODO' as `Ubicación de la Agencia`,
-    'TODO' as `Código del Departamento`,
-    'TODO' as `Código del Distrito`,
-    'TODO' as `Estado de la Agencia`
+    'TODO' as "Código de la Agencia",
+    'TODO' as "Nombre de la Agencia",
+    'TODO' as "Ubicación de la Agencia",
+    'TODO' as "Código del Departamento",
+    'TODO' as "Código del Distrito",
+    'TODO' as "Estado de la Agencia"
 from final

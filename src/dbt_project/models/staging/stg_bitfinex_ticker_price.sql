@@ -9,9 +9,19 @@ with
         select * from {{ source("bitfinex", "bitfinex_ticker_dlt") }}
     )
 select
-    * except (last_price),
+    bid,
+    bid_size,
+    ask,
+    ask_size,
+    daily_change,
+    daily_change_relative,
+    volume,
+    high,
+    low,
+    symbol,
+    requested_at,
+    _dlt_load_id,
+    _dlt_id,
     last_price as last_price_usd,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_bitfinex_ticker

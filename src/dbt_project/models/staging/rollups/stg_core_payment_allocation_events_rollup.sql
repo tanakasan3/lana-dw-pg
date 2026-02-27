@@ -40,7 +40,5 @@ select
     obligation_type,
     payment_id,
     receivable_account_id,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_stg_core_payment_allocation_events_rollup

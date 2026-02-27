@@ -7,5 +7,5 @@ with
 select
     'TODO' as {{ ident('id_codigo_extracontable') }},
     'TODO' as {{ ident('desc_extra_contable') }},
-    7060.0 as `Valor`
+    7060.0 as "Valor"
 from final

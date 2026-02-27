@@ -38,7 +38,5 @@ select
     public_id,
     telegram_handle,
     is_kyc_approved,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_stg_core_customer_events_rollup

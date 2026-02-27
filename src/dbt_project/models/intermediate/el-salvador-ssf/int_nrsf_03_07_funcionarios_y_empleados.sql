@@ -8,17 +8,17 @@ with
     )
 
 select
-    married_name as `Apellido de casada`,
-    '2008-10-31' as `Fecha de ingreso`,
-    'TODO' as `Cargo`,
-    'TODO' as `Código del documento`,
-    'TODO' as `Número de documento`,
-    'TODO' as `Número Telefónico`,
-    'TODO' as `Departamento`,
-    '0' as `Relacionado por administración`,
-    split(first_name, ' ')[0 + 1] as `Primer Nombre`,
-    split(first_name, ' ')[1 + 1] as `Segundo Nombre`,
-    split(last_name, ' ')[0 + 1] as `Primer Apellido`,
-    split(last_name, ' ')[1 + 1] as `Segundo Apellido`,
-    left(replace(customer_id, '-', ''), 14) as `NIU`
+    married_name as "Apellido de casada",
+    '2008-10-31' as "Fecha de ingreso",
+    'TODO' as "Cargo",
+    'TODO' as "Código del documento",
+    'TODO' as "Número de documento",
+    'TODO' as "Número Telefónico",
+    'TODO' as "Departamento",
+    '0' as "Relacionado por administración",
+    split(first_name, ' ')[0 + 1] as "Primer Nombre",
+    split(first_name, ' ')[1 + 1] as "Segundo Nombre",
+    split(last_name, ' ')[0 + 1] as "Primer Apellido",
+    split(last_name, ' ')[1 + 1] as "Segundo Apellido",
+    left(replace(customer_id, '-', ''), 14) as "NIU"
 from customers

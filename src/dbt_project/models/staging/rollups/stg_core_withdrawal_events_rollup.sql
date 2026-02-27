@@ -42,7 +42,5 @@ select
     is_approval_process_concluded,
     is_cancelled,
     is_confirmed,
-    timestamp_micros(
-        cast(cast(_dlt_load_id as decimal) * 1e6 as int64)
-    ) as loaded_to_dw_at
+    to_timestamp(_dlt_load_id::decimal) as loaded_to_dw_at
 from raw_stg_core_withdrawal_events_rollup
