@@ -1,0 +1,14 @@
+# PostgreSQL-only dbt profile for lana-dw-pg
+
+lana_dw:
+  target: postgres
+  outputs:
+    postgres:
+      type: postgres
+      host: "{{ env_var('DST_PG_HOST', 'localhost') }}"
+      port: "{{ env_var('DST_PG_PORT', '5432') | as_number }}"
+      user: "{{ env_var('DST_PG_USER', 'postgres') }}"
+      password: "{{ env_var('DST_PG_PASSWORD', '') }}"
+      dbname: "{{ env_var('DST_PG_DATABASE', 'lana_dw') }}"
+      schema: "{{ env_var('DST_DBT_SCHEMA', 'dbt') }}"
+      threads: 4

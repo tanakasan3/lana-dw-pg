@@ -1,0 +1,8 @@
+[project]
+name = "lana-dw-pg"
+version = "0.1.0"
+description = "Standalone Dagster data pipeline for lana-bank targeting PostgreSQL"
+requires-python = ">=3.11"
+
+[tool.dagster]
+module_name = "src.definitions"
