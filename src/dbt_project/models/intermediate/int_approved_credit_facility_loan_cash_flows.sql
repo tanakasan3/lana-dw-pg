@@ -13,70 +13,102 @@ with
     projections as (
         select
             *,
-            safe_divide(
-                annual_interest_rate,
+            annual_interest_rate / nullif(
                 case
-                    when ends_with(day_count_convention, '/360')
+                    when day_count_convention like '%/360'
                     then 360.0
-                    when ends_with(day_count_convention, '/365')
+                    when day_count_convention like '%/365'
                     then 365.0
                     else
-                        timestamp_diff(
-                            timestamp(last_day(date(start_date), year)),
-                            date_trunc(start_date, year),
-                            day
-                        )
-                end
+                        extract(day from (
+                            (date_trunc('year', start_date::date) + interval '1 year' - interval '1 day')::timestamp
+                            - date_trunc('year', start_date::date)::timestamp
+                        ))
+                end, 0
             ) as daily_interest_rate,
             case
-                when ends_with(day_count_convention, '/360')
+                when day_count_convention like '%/360'
                 then 360.0
-                when ends_with(day_count_convention, '/365')
+                when day_count_convention like '%/365'
                 then 365.0
                 else
-                    timestamp_diff(
-                        timestamp(last_day(date(start_date), year)),
-                        date_trunc(start_date, year),
-                        day
-                    )
-            end as days_per_year,
-            case
-                when accrual_cycle_interval = 'end_of_day'
-                then
-                    generate_date_array(
-                        date(start_date), last_day(date(end_date)), interval 1 day
-                    )
-                when accrual_cycle_interval = 'end_of_month'
-                then
-                    generate_date_array(
-                        date(start_date), last_day(date(end_date)), interval 1 month
-                    )
-            end as interest_schedule_months
+                    extract(day from (
+                        (date_trunc('year', start_date::date) + interval '1 year' - interval '1 day')::timestamp
+                        - date_trunc('year', start_date::date)::timestamp
+                    ))
+            end as days_per_year
         from loans
     ),
 
+    -- Generate date series for interest schedule
     projected_interest_cash_flow_data as (
         select
-            p.* except (interest_schedule_months),
+            p.credit_facility_id,
+            p.disbursal_id,
+            p.customer_id,
+            p.facility_initialized_recorded_at,
+            p.disbursal_initialized_recorded_at,
+            p.disbursal_settled_recorded_at,
+            p.start_date,
+            p.end_date,
+            p.duration_value,
+            p.duration_type,
+            p.annual_rate,
+            p.accrual_interval,
+            p.accrual_cycle_interval,
+            p.facility_amount_usd,
+            p.total_disbursed_usd,
+            p.matured,
+            p.day_count_convention,
+            p.annual_interest_rate,
+            p.daily_interest_rate,
+            p.days_per_year,
             case
-                when timestamp(date_trunc(projected_month, month)) < start_date
-                then timestamp(date(start_date))
-                else timestamp(date_trunc(projected_month, month))
+                when date_trunc('month', projected_month)::timestamp < p.start_date
+                then p.start_date::timestamp
+                else date_trunc('month', projected_month)::timestamp
             end as period_start_date,
             case
-                when last_day(projected_month) > date(end_date)
-                then timestamp(date(end_date))
-                else timestamp(last_day(projected_month))
+                when (date_trunc('month', projected_month) + interval '1 month' - interval '1 day')::date > p.end_date::date
+                then p.end_date::timestamp
+                else (date_trunc('month', projected_month) + interval '1 month' - interval '1 day')::timestamp
             end as period_end_date,
             'projected_interest_cash_flow' as cash_flow_type
-        from projections as p, unnest(interest_schedule_months) as projected_month
+        from projections as p
+        cross join lateral generate_series(
+            p.start_date::date,
+            (date_trunc('month', p.end_date::date) + interval '1 month' - interval '1 day')::date,
+            case 
+                when p.accrual_cycle_interval = 'end_of_day' then interval '1 day'
+                else interval '1 month'
+            end
+        ) as projected_month
     ),
 
     projected_principal_cash_flow_data as (
         select
-            * except (interest_schedule_months),
-            timestamp(date(start_date)) as period_start_date,
-            timestamp(date(end_date)) as period_end_date,
+            credit_facility_id,
+            disbursal_id,
+            customer_id,
+            facility_initialized_recorded_at,
+            disbursal_initialized_recorded_at,
+            disbursal_settled_recorded_at,
+            start_date,
+            end_date,
+            duration_value,
+            duration_type,
+            annual_rate,
+            accrual_interval,
+            accrual_cycle_interval,
+            facility_amount_usd,
+            total_disbursed_usd,
+            matured,
+            day_count_convention,
+            annual_interest_rate,
+            daily_interest_rate,
+            days_per_year,
+            start_date::timestamp as period_start_date,
+            end_date::timestamp as period_end_date,
             'projected_principal_cash_flow' as cash_flow_type
         from projections
     ),
@@ -92,8 +124,7 @@ with
     projected_time_data as (
         select
             *,
-            timestamp_diff(date(period_end_date), date(period_start_date), day)
-            + 1 as days_in_period
+            extract(day from (period_end_date::date - period_start_date::date))::integer + 1 as days_in_period
         from projected_cash_flow_data
     ),
 

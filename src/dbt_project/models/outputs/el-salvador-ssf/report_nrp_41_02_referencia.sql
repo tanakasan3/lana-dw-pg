@@ -19,10 +19,10 @@ select
     cast({{ ident('dias_mora_k') }} as text) as {{ ident('dias_mora_k') }},
     cast({{ ident('dias_mora_i') }} as text) as {{ ident('dias_mora_i') }},
     to_char(
-        'YYYY-MM-DD', cast({{ ident('fecha_inicio_mora_k') }} as date)
+        cast({{ ident('fecha_inicio_mora_k') }} as date), 'YYYY-MM-DD'
     ) as {{ ident('fecha_inicio_mora_k') }},
     to_char(
-        'YYYY-MM-DD', cast({{ ident('fecha_inicio_mora_i') }} as date)
+        cast({{ ident('fecha_inicio_mora_i') }} as date), 'YYYY-MM-DD'
     ) as {{ ident('fecha_inicio_mora_i') }},
     left({{ ident('pago_capital') }}, 1) as {{ ident('pago_capital') }},
     left({{ ident('pago_interes') }}, 1) as {{ ident('pago_interes') }},
@@ -45,10 +45,10 @@ select
     format('%.2f', round({{ ident('monto_desembolsado') }}, 2)) as {{ ident('monto_desembolsado') }},
     left({{ ident('tipo_credito') }}, 2) as {{ ident('tipo_credito') }},
     to_char(
-        'YYYY-MM-DD', cast({{ ident('fecha_ultimo_pago_k') }} as date)
+        cast({{ ident('fecha_ultimo_pago_k') }} as date), 'YYYY-MM-DD'
     ) as {{ ident('fecha_ultimo_pago_k') }},
     to_char(
-        'YYYY-MM-DD', cast({{ ident('fecha_ultimo_pago_i') }} as date)
+        cast({{ ident('fecha_ultimo_pago_i') }} as date), 'YYYY-MM-DD'
     ) as {{ ident('fecha_ultimo_pago_i') }},
     cast({{ ident('dia_pago_k') }} as text) as {{ ident('dia_pago_k') }},
     cast({{ ident('dia_pago_i') }} as text) as {{ ident('dia_pago_i') }},

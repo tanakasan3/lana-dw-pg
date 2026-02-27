@@ -6,19 +6,17 @@ with
             expanded.account_set_id,
             expanded.member_id,
             expanded.member_type,
-            string_agg(set_name, ":" order by o) as set_hierarchy_string
+            string_agg(set_name, ':' order by o) as set_hierarchy_string
 
         from
-            {{ ref("int_account_sets_expanded") }} as expanded,
-            unnest(set_hierarchy) as parent_set_id
-        with
-        offset as o
+            {{ ref("int_account_sets_expanded") }} as expanded
+        cross join lateral unnest(set_hierarchy) with ordinality as t(parent_set_id, o)
 
         inner join
             {{ ref("int_account_sets") }} as account_sets
             on parent_set_id = account_sets.account_set_id
 
-        group by account_set_id, member_id, member_type
+        group by expanded.account_set_id, expanded.member_id, expanded.member_type
 
     ),
 
