@@ -5,6 +5,6 @@ select
     left(replace(nit_depositante, '-', ''), 14) as {{ ident('nit_depositante') }},
     to_char( cast({{ ident('fecha_deposito') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_deposito') }},
     to_char( cast({{ ident('fecha_vencimiento') }} as date), 'YYYY-MM-DD') as {{ ident('fecha_vencimiento') }},
-    format('%.2f', round({{ ident('valor_deposito') }}, 2)) as {{ ident('valor_deposito') }}
+    to_char(round({{ ident('valor_deposito') }}, 2), 'FM9999999990.00') as {{ ident('valor_deposito') }}
 
 from {{ ref("int_nrp_41_07_garantia_pignorada") }}
