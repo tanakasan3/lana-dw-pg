@@ -25,6 +25,7 @@ x-dest-pg-env: &dest-pg-env
   DST_DBT_SCHEMA: ${DST_DBT_SCHEMA:-dbt}
 
 x-dagster-env: &dagster-env
+  DAGSTER_HOME: /opt/dagster/dagster_home
   DAGSTER_POSTGRES_HOST: dagster-postgres
   DAGSTER_POSTGRES_USER: dagster
   DAGSTER_POSTGRES_PASSWORD: dagster
