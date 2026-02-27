@@ -78,7 +78,7 @@ logs:
 	docker compose logs -f
 
 logs-dagster:
-	docker compose logs -f dagster-code-location
+	docker logs -f dagster-code-location
 
 build:
 	docker compose build
@@ -93,19 +93,19 @@ clean:
 
 # Run all Lana EL jobs (source PG -> raw schema)
 materialize-el:
-	docker compose exec dagster-code-location dagster asset materialize \
+	docker exec dagster-code-location dagster asset materialize \
 		--select 'lana/*' \
 		-d /lana-dw-pg
 
 # Run dbt seeds
 materialize-seeds:
-	docker compose exec dagster-code-location dagster asset materialize \
+	docker exec dagster-code-location dagster asset materialize \
 		--select 'dbt_lana_dw/seeds/*' \
 		-d /lana-dw-pg
 
 # Run dbt models (raw -> dbt schema)
 materialize-dbt:
-	docker compose exec dagster-code-location dagster asset materialize \
+	docker exec dagster-code-location dagster asset materialize \
 		--select 'dbt_lana_dw/*' \
 		-d /lana-dw-pg
 
@@ -114,7 +114,7 @@ materialize-all: materialize-el materialize-seeds materialize-dbt
 
 # Run Bitfinex EL jobs
 materialize-bitfinex:
-	docker compose exec dagster-code-location dagster asset materialize \
+	docker exec dagster-code-location dagster asset materialize \
 		--select 'bitfinex/*' \
 		-d /lana-dw-pg
 
