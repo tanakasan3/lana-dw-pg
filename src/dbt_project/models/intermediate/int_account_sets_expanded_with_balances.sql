@@ -27,9 +27,9 @@ with
             h.*,
             coalesce(
                 case
-                    when normal_balance_type = "credit"
+                    when normal_balance_type = 'credit'
                     then settled_cr - settled_dr
-                    when normal_balance_type = "debit"
+                    when normal_balance_type = 'debit'
                     then settled_dr - settled_cr
                 end,
                 0
@@ -46,7 +46,7 @@ with
             {{ ref("int_account_balances") }} as balances
             on balances.account_id = member_id
 
-        where member_type = "Account"
+        where member_type = 'Account'
     )
 
 select *
