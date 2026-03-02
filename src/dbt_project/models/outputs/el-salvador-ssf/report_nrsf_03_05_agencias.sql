@@ -5,5 +5,5 @@ select
     left("Código del Departamento", 2) as "Código del Departamento",
     left("Código del Distrito", 2) as "Código del Distrito",
     left("Estado de la Agencia", 1) as "Estado de la Agencia",
-    current_timestamp() as created_at
+    current_timestamp as created_at
 from {{ ref("int_nrsf_03_05_agencias") }}

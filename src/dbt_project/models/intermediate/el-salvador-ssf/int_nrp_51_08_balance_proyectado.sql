@@ -74,4 +74,4 @@ select
         0
     ) as {{ ident('diciembre') }}
 from {{ ref("int_approved_credit_facility_loan_cash_flows") }}
-where extract(year from period_end_date) = extract(year from current_timestamp())
+where extract(year from period_end_date) = extract(year from current_timestamp)
