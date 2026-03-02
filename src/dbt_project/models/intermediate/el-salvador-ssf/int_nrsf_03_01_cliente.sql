@@ -17,11 +17,11 @@ with
 
 select
     customer_public_ids.id as "NIU",
-    split(first_name, ' ')[0 + 1] as "Primer Nombre",
-    split(first_name, ' ')[1 + 1] as "Segundo Nombre",
+    split_part(first_name, ' ', 1) as "Primer Nombre",
+    split_part(first_name, ' ', 2) as "Segundo Nombre",
     cast(null as text) as "Tercer Nombre",
-    split(last_name, ' ')[0 + 1] as "Primer Apellido",
-    split(last_name, ' ')[1 + 1] as "Segundo Apellido",
+    split_part(last_name, ' ', 1) as "Primer Apellido",
+    split_part(last_name, ' ', 2) as "Segundo Apellido",
     married_name as "Apellido de casada",
     cast(null as text) as "Razón social",
     '1' as "Tipo de persona",

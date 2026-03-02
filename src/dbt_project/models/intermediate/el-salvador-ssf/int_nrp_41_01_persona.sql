@@ -6,10 +6,10 @@ select
 
     dui,
 
-    upper(split(last_name, ' ')[0 + 1]) as {{ ident('primer_apellido') }},
-    upper(split(last_name, ' ')[1 + 1]) as {{ ident('segundo_apellido') }},
-    upper(split(first_name, ' ')[0 + 1]) as {{ ident('primer_nombre') }},
-    upper(split(first_name, ' ')[1 + 1]) as {{ ident('segundo_nombre') }},
+    upper(split_part(last_name, ' ', 1)) as {{ ident('primer_apellido') }},
+    upper(split_part(last_name, ' ', 2)) as {{ ident('segundo_apellido') }},
+    upper(split_part(first_name, ' ', 1)) as {{ ident('primer_nombre') }},
+    upper(split_part(first_name, ' ', 2)) as {{ ident('segundo_nombre') }},
     cast(null as text) as {{ ident('apellido_casada') }},
 
     -- NULL for natural person

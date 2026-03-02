@@ -4,20 +4,20 @@ with
 
     statuses as (
         select
-            ref.* except (customer_id, disbursal_id),
+            ref.credit_facility_id,
             estado,
             {{ ident('explicación') }},
             status,
             explanation,
-            coalesce(dias_mora_k, 0) as days_past_due_on_principal,
-            coalesce(dias_mora_i, 0) as days_past_due_on_interest,
+            coalesce(ref."dias_mora_k", 0) as days_past_due_on_principal,
+            coalesce(ref."dias_mora_i", 0) as days_past_due_on_interest,
             greatest(
-                coalesce(dias_mora_k, 0), coalesce(dias_mora_i, 0)
+                coalesce(ref."dias_mora_k", 0), coalesce(ref."dias_mora_i", 0)
             ) as payment_overdue_days
         from {{ ref("int_nrp_41_02_referencia") }} as ref
         left join
             {{ ref("static_nrp_41_estados_del_prestamo") }}
-            on greatest(coalesce(dias_mora_k, 0), coalesce(dias_mora_i, 0))
+            on greatest(coalesce(ref."dias_mora_k", 0), coalesce(ref."dias_mora_i", 0))
             between consumer_calendar_ge_days and consumer_calendar_le_days
     ),
 

@@ -30,8 +30,8 @@ select
     0.0 as "Saldo de intereses",
     7060 as "Saldo garantizado",
     left(replace(customer_id, '-', ''), 14) as "NIU",
-    split(first_name, ' ')[0 + 1] as "Primer Nombre",
-    split(first_name, ' ')[1 + 1] as "Segundo Nombre",
-    split(last_name, ' ')[0 + 1] as "Primer Apellido",
-    split(last_name, ' ')[1 + 1] as "Segundo Apellido"
+    split_part(first_name, ' ', 1) as "Primer Nombre",
+    split_part(first_name, ' ', 2) as "Segundo Nombre",
+    split_part(last_name, ' ', 1) as "Primer Apellido",
+    split_part(last_name, ' ', 2) as "Segundo Apellido"
 from final
