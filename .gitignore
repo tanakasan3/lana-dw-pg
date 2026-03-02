@@ -49,8 +49,10 @@ src/dbt_project/logs/
 .env
 .env.local
 
-# Secrets - Sumsub test IDs (contains real external user IDs)
-sumsub_external_user_ids.csv
+# Secrets directory (contains real external user IDs, keys, etc.)
+secrets/*
+!secrets/.gitkeep
+!secrets/*.example
 
 # OS
 .DS_Store

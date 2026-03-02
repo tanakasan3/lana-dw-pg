@@ -26,6 +26,7 @@ help:
 	@echo "  make materialize-all       Run all (EL + seeds + dbt)"
 	@echo "  make materialize-bitfinex  Run Bitfinex EL jobs"
 	@echo "  make materialize-sumsub    Run Sumsub EL (needs SUMSUB_KEY/SECRET)"
+	@echo "                             Use SUMSUB_USE_TEST_IDS=true for test mode"
 	@echo ""
 	@echo "Database:"
 	@echo "  make psql            Connect to destination PG"
@@ -122,8 +123,16 @@ materialize-bitfinex:
 	$(DAGSTER_JOB) -j bitfinex_order_book_el
 
 # Run Sumsub applicants EL (requires SUMSUB_KEY and SUMSUB_SECRET env vars)
+# Test mode: SUMSUB_USE_TEST_IDS=true make materialize-sumsub
+# (requires sumsub_external_user_ids.csv mounted in container via docker-compose)
 materialize-sumsub:
+ifdef SUMSUB_USE_TEST_IDS
+	docker exec -e SUMSUB_USE_TEST_IDS=$(SUMSUB_USE_TEST_IDS) \
+		dagster-code-location dagster job execute \
+		-f /lana-dw-pg/src/definitions.py -d /lana-dw-pg -j sumsub_applicants_el
+else
 	$(DAGSTER_JOB) -j sumsub_applicants_el
+endif
 
 # =============================================================================
 # Database - Destination PG

@@ -23,8 +23,8 @@ REQUEST_TIMEOUT = 60
 SUMSUB_API_BASE = "https://api.sumsub.com"
 SUMSUB_APPLICANTS_DLT_TABLE = "sumsub_applicants_dlt"
 
-# Path to test ID mappings CSV (relative to project root) - NOT committed to repo
-TEST_IDS_CSV_PATH = "sumsub_external_user_ids.csv"
+# Path to test ID mappings CSV (in secrets directory) - NOT committed to repo
+TEST_IDS_CSV_PATH = "secrets/sumsub_external_user_ids.csv"
 
 
 def _load_test_ids(csv_path: Optional[str] = None) -> Tuple[Dict[str, str], List[str]]:
