@@ -40,9 +40,9 @@ with
             'Disbursement' as transaction,
             total_disbursed_usd as principal,
 
-            null as interest,
-            null as fee,
-            null as vat,
+            cast(null as numeric) as interest,
+            cast(null as numeric) as fee,
+            cast(null as numeric) as vat,
             total_disbursed_usd as total_transaction,
             first_name || ' ' || last_name as customer_name,
             coalesce(estado, 'Cancelado') as estado,

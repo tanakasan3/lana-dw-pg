@@ -39,9 +39,9 @@ with
             disbursal_start_date as date_and_time,
             'Disbursement' as {{ ident('transaction') }},
             total_disbursed_usd as principal,
-            null as interest,
-            null as fee,
-            null as vat,
+            cast(null as numeric) as interest,
+            cast(null as numeric) as fee,
+            cast(null as numeric) as vat,
             total_disbursed_usd as total_transaction
         from {{ ref("int_approved_credit_facility_loans") }}
         left join customers using (customer_id)
@@ -67,8 +67,8 @@ with
             'Payment' as {{ ident('transaction') }},
             disbursal_usd as principal,
             interest_usd as interest,
-            null as fee,
-            null as vat,
+            cast(null as numeric) as fee,
+            cast(null as numeric) as vat,
             amount_usd as total_transaction
         from {{ ref("int_payment_history") }} as ph
         inner join loans on credit_facility_id = line_of_credit
