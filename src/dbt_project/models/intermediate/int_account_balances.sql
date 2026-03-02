@@ -1,7 +1,7 @@
 with latest_balances as (
     select 
         values,
-        (values::jsonb)->'account_id' as account_id,
+        (values::jsonb)->>'account_id' as account_id,
         (values::jsonb)->>'currency' as currency,
         row_number() over (
             partition by (values::jsonb)->>'account_id', (values::jsonb)->>'currency'
@@ -19,7 +19,7 @@ with latest_balances as (
 select
     cast(((values::jsonb)->'settled'->>'cr_balance') as numeric) as settled_cr,
     cast(((values::jsonb)->'settled'->>'dr_balance') as numeric) as settled_dr,
-    account_id::text as account_id,
+    account_id,
     currency
 
 from latest_balances
