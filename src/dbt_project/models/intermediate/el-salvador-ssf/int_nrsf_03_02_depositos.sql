@@ -13,10 +13,10 @@ with
     ),
 
     btc_price as (
-
-        select any_value(last_price_usd having max requested_at) as last_price_usd
+        select last_price_usd
         from {{ ref("stg_bitfinex_ticker_price") }}
-
+        order by requested_at desc
+        limit 1
     ),
 
     final as (
@@ -61,9 +61,9 @@ select
     deposit_account_balance_usd as "Saldo total",
     '1' as "Estado",
     left(replace(upper(deposit_account_id), '-', ''), 20) as "Número de cuenta",
-    last_day(current_date(), month) as "Día de corte",
-    safe_multiply(
-        (deposit_account_balance_usd)::numeric / nullif((100000000.0)::numeric, 0),
-        (select last_price_usd from btc_price)
-    ) as "Saldo de capital"
+    {{ last_day('current_date', 'month') }} as "Día de corte",
+    {{ safe_multiply(
+        safe_divide('deposit_account_balance_usd', '100000000.0'),
+        '(select last_price_usd from btc_price)'
+    ) }} as "Saldo de capital"
 from final

@@ -8,12 +8,12 @@
     select {{ ident('primer_apellido') }} from ...
 #}
 
-{% macro ident(name) %}
-  {% if target.type == 'bigquery' %}
+{%- macro ident(name) -%}
+  {%- if target.type == 'bigquery' -%}
     `{{ name }}`
-  {%- elif target.type == 'postgres' %}
+  {%- elif target.type == 'postgres' -%}
     "{{ name }}"
-  {%- else %}
+  {%- else -%}
     "{{ name }}"
-  {%- endif %}
-{% endmacro %}
+  {%- endif -%}
+{%- endmacro -%}
