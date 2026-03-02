@@ -8,6 +8,7 @@ import hashlib
 import hmac
 import logging
 import os
+import random
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,17 +23,24 @@ REQUEST_TIMEOUT = 60
 SUMSUB_API_BASE = "https://api.sumsub.com"
 SUMSUB_APPLICANTS_DLT_TABLE = "sumsub_applicants_dlt"
 
-# Path to test ID mappings CSV (relative to project root)
-TEST_IDS_CSV_PATH = "src/dbt_project/seeds/sumsub_approved_applicants.csv"
+# Path to test ID mappings CSV (relative to project root) - NOT committed to repo
+TEST_IDS_CSV_PATH = "sumsub_external_user_ids.csv"
 
 
-def _load_test_id_mappings(csv_path: Optional[str] = None) -> Dict[str, str]:
-    """Load customer_id -> sumsub_external_user_id mappings from CSV."""
+def _load_test_ids(csv_path: Optional[str] = None) -> Tuple[Dict[str, str], List[str]]:
+    """Load test ID data from CSV.
+    
+    Returns:
+        Tuple of (mappings dict, list of all sumsub IDs for random selection)
+        - mappings: local_customer_id -> sumsub_external_user_id (explicit mappings)
+        - all_ids: list of all sumsub_external_user_ids (for random fallback)
+    """
     if csv_path is None:
-        # Try to find the CSV relative to this file or project root
+        # Try to find the CSV in common locations
         candidates = [
             Path(__file__).parent.parent.parent / TEST_IDS_CSV_PATH,
             Path("/lana-dw-pg") / TEST_IDS_CSV_PATH,
+            Path.cwd() / TEST_IDS_CSV_PATH,
             Path(TEST_IDS_CSV_PATH),
         ]
         for candidate in candidates:
@@ -41,17 +49,28 @@ def _load_test_id_mappings(csv_path: Optional[str] = None) -> Dict[str, str]:
                 break
     
     if csv_path is None or not Path(csv_path).exists():
-        return {}
+        return {}, []
     
     mappings = {}
+    all_ids = []
+    
     with open(csv_path, "r") as f:
         reader = csv.DictReader(f)
         for row in reader:
             local_id = row.get("local_customer_id", "").strip()
             sumsub_id = row.get("sumsub_external_user_id", "").strip()
-            if local_id and sumsub_id and not local_id.startswith("#"):
+            
+            # Skip comments and empty rows
+            if not sumsub_id or sumsub_id.startswith("#"):
+                continue
+            
+            all_ids.append(sumsub_id)
+            
+            # Only add to mappings if local_id is explicitly provided
+            if local_id and not local_id.startswith("#"):
                 mappings[local_id] = sumsub_id
-    return mappings
+    
+    return mappings, all_ids
 
 
 def _sumsub_send(
@@ -194,17 +213,19 @@ def applicants(
     if logger is None:
         logger = logging.getLogger("sumsub_applicants")
     
-    # Load test ID mappings if enabled
+    # Load test ID data if enabled
     test_id_mappings: Dict[str, str] = {}
+    test_id_pool: List[str] = []
     if use_test_ids:
-        test_id_mappings = _load_test_id_mappings(test_ids_csv_path)
+        test_id_mappings, test_id_pool = _load_test_ids(test_ids_csv_path)
         logger.info(
-            "Test ID mode enabled. Loaded %d mappings from CSV.", 
-            len(test_id_mappings)
+            "Test ID mode enabled. Loaded %d explicit mappings, %d IDs in pool for random selection.", 
+            len(test_id_mappings),
+            len(test_id_pool),
         )
-        if not test_id_mappings:
+        if not test_id_pool:
             logger.warning(
-                "No test ID mappings found! Add entries to %s", 
+                "No test IDs found! Add entries to %s", 
                 TEST_IDS_CSV_PATH
             )
     
@@ -224,13 +245,23 @@ def applicants(
         for customer_id, max_recorded_at in customer_rows:
             # Optionally substitute with test ID
             lookup_id = customer_id
-            if use_test_ids and customer_id in test_id_mappings:
-                lookup_id = test_id_mappings[customer_id]
-                logger.info(
-                    "Using test ID mapping: %s -> %s",
-                    customer_id,
-                    lookup_id,
-                )
+            if use_test_ids:
+                if customer_id in test_id_mappings:
+                    # Use explicit mapping
+                    lookup_id = test_id_mappings[customer_id]
+                    logger.info(
+                        "Using explicit test ID mapping: %s -> %s",
+                        customer_id,
+                        lookup_id,
+                    )
+                elif test_id_pool:
+                    # Pick random ID from pool
+                    lookup_id = random.choice(test_id_pool)
+                    logger.info(
+                        "Using random test ID for %s -> %s",
+                        customer_id,
+                        lookup_id,
+                    )
             
             logger.info(
                 "Fetching Sumsub data for customer_id=%s (lookup_id=%s) recorded_at=%s",

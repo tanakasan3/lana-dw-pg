@@ -1,4 +1,0 @@
-local_customer_id,sumsub_external_user_id
-# Add mappings here: local customer ID -> known good Sumsub external user ID
-# Example:
-# 019c67f7-d360-77c3-adf8-0aa447591778,known-good-sumsub-id-1

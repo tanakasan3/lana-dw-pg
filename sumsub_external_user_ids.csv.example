@@ -1,0 +1,24 @@
+local_customer_id,sumsub_external_user_id
+# Sumsub Test ID Mappings
+# ========================
+# This file maps local customer IDs to known Sumsub external user IDs.
+# 
+# Usage:
+#   1. Copy this file to sumsub_external_user_ids.csv
+#   2. Add your Sumsub external user IDs
+#   3. Run the job with SUMSUB_USE_TEST_IDS=true
+#
+# Format:
+#   - If local_customer_id is provided: explicit mapping (that ID -> this Sumsub ID)
+#   - If local_customer_id is empty: ID is added to random pool (any customer can use it)
+#
+# Examples:
+#
+# Explicit mapping - this local customer always uses this Sumsub ID:
+# 019c67f7-d360-77c3-adf8-0aa447591778,sumsub-external-id-123
+#
+# Random pool - any customer without explicit mapping picks randomly from these:
+# ,sumsub-external-id-456
+# ,sumsub-external-id-789
+#
+# DO NOT COMMIT THE ACTUAL FILE (sumsub_external_user_ids.csv) - it's in .gitignore

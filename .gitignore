@@ -49,6 +49,9 @@ src/dbt_project/logs/
 .env
 .env.local
 
+# Secrets - Sumsub test IDs (contains real external user IDs)
+sumsub_external_user_ids.csv
+
 # OS
 .DS_Store
 Thumbs.db
