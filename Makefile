@@ -1,6 +1,7 @@
 .PHONY: help up up-external down restart logs build clean \
         materialize-el materialize-seeds materialize-dbt materialize-all \
-        psql psql-schemas psql-tables psql-raw psql-dbt init-schemas
+        psql psql-schemas psql-tables psql-raw psql-dbt init-schemas \
+        drop-schemas drop-schemas-force
 
 # Default target
 help:
@@ -34,6 +35,8 @@ help:
 	@echo "  make psql-dbt        List tables in dbt schema"
 	@echo "  make psql-source     Connect to source PG (if separate)"
 	@echo "  make init-schemas    Create raw/dbt schemas on external PG"
+	@echo "  make drop-schemas    ⚠️  DROP ALL and recreate schemas (5s delay)"
+	@echo "  make drop-schemas-force  DROP ALL without confirmation (CI/scripts)"
 	@echo ""
 	@echo "External PG mode requires these env vars:"
 	@echo "  PG_CON, DST_PG_HOST, DST_PG_PORT, DST_PG_DATABASE, DST_PG_USER, DST_PG_PASSWORD"
@@ -187,6 +190,27 @@ init-schemas:
 	@$(PSQL_CMD) -c "CREATE SCHEMA IF NOT EXISTS $(DST_RAW_SCHEMA);"
 	@$(PSQL_CMD) -c "CREATE SCHEMA IF NOT EXISTS $(DST_DBT_SCHEMA);"
 	@echo "Schemas created: $(DST_RAW_SCHEMA), $(DST_DBT_SCHEMA)"
+
+# Drop and recreate schemas (DESTRUCTIVE - drops all tables, views, etc.)
+drop-schemas:
+	@echo "⚠️  WARNING: This will DROP ALL DATA in $(DST_RAW_SCHEMA) and $(DST_DBT_SCHEMA)!"
+	@echo "Press Ctrl+C to cancel, or wait 5 seconds to continue..."
+	@sleep 5
+	@echo "Dropping schemas..."
+	@$(PSQL_CMD) -c "DROP SCHEMA IF EXISTS $(DST_RAW_SCHEMA) CASCADE;"
+	@$(PSQL_CMD) -c "DROP SCHEMA IF EXISTS $(DST_DBT_SCHEMA) CASCADE;"
+	@echo "Recreating empty schemas..."
+	@$(PSQL_CMD) -c "CREATE SCHEMA $(DST_RAW_SCHEMA);"
+	@$(PSQL_CMD) -c "CREATE SCHEMA $(DST_DBT_SCHEMA);"
+	@echo "✅ Schemas reset: $(DST_RAW_SCHEMA), $(DST_DBT_SCHEMA)"
+
+# Force drop without confirmation (for scripts/CI)
+drop-schemas-force:
+	@$(PSQL_CMD) -c "DROP SCHEMA IF EXISTS $(DST_RAW_SCHEMA) CASCADE;"
+	@$(PSQL_CMD) -c "DROP SCHEMA IF EXISTS $(DST_DBT_SCHEMA) CASCADE;"
+	@$(PSQL_CMD) -c "CREATE SCHEMA $(DST_RAW_SCHEMA);"
+	@$(PSQL_CMD) -c "CREATE SCHEMA $(DST_DBT_SCHEMA);"
+	@echo "✅ Schemas reset: $(DST_RAW_SCHEMA), $(DST_DBT_SCHEMA)"
 
 # =============================================================================
 # Database - Source PG (if using external source)
