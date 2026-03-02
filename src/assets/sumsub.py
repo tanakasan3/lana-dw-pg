@@ -23,18 +23,12 @@ SUMSUB_SYSTEM_NAME = "sumsub"
 class SumsubConfig(dg.Config):
     """Configuration for the Sumsub applicants asset."""
     
-    use_test_ids: bool = dg.Field(
-        default=False,
-        description=(
-            "If True, substitute local customer IDs with known good Sumsub "
-            "external user IDs from sumsub_approved_applicants.csv. "
-            "Useful for testing with real Sumsub data when local IDs don't exist."
-        ),
-    )
-    test_ids_csv_path: str = dg.Field(
-        default="",
-        description="Optional custom path to the test ID mappings CSV file.",
-    )
+    use_test_ids: bool = False
+    """If True, substitute local customer IDs with known good Sumsub 
+    external user IDs from sumsub_external_user_ids.csv."""
+    
+    test_ids_csv_path: str = ""
+    """Optional custom path to the test ID mappings CSV file."""
 
 
 def sumsub_applicants(
