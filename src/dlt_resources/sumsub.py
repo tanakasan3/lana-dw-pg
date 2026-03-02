@@ -109,6 +109,27 @@ def _get_customers_pg(
         return [(row.customer_id, row.recorded_at) for row in result]
 
 
+def _ensure_table_exists(connection_string: str, schema: str) -> None:
+    """Create the sumsub_applicants_dlt table if it doesn't exist."""
+    engine = create_engine(connection_string)
+    
+    sql = text(f"""
+        CREATE TABLE IF NOT EXISTS {schema}.{SUMSUB_APPLICANTS_DLT_TABLE} (
+            customer_id TEXT NOT NULL,
+            recorded_at TIMESTAMPTZ NOT NULL,
+            content TEXT,
+            document_images JSONB,
+            _dlt_load_id TEXT,
+            _dlt_id TEXT,
+            PRIMARY KEY (customer_id, recorded_at)
+        )
+    """)
+    
+    with engine.connect() as conn:
+        conn.execute(sql)
+        conn.commit()
+
+
 @dlt.resource(
     name=SUMSUB_APPLICANTS_DLT_TABLE,
     write_disposition="append",
@@ -131,6 +152,9 @@ def applicants(
     """
     if logger is None:
         logger = logging.getLogger("sumsub_applicants")
+    
+    # Ensure table exists even if no records are yielded
+    _ensure_table_exists(dest_connection_string, raw_schema)
     
     start_ts: datetime = inbox_events_since.last_value or datetime(
         1970, 1, 1, tzinfo=timezone.utc
@@ -155,6 +179,14 @@ def applicants(
                 )
                 resp.raise_for_status()
             except RequestException as e:
+                # 404 = customer not in Sumsub yet, skip and continue
+                # Other errors (rate limit, auth) = stop processing
+                if hasattr(e, 'response') and e.response is not None and e.response.status_code == 404:
+                    logger.info(
+                        "Customer not found in Sumsub (404), skipping: customer_id=%s",
+                        customer_id,
+                    )
+                    continue
                 logger.warning(
                     "Applicant fetch failed for customer_id=%s (will retry next run): %s",
                     customer_id,
@@ -166,11 +198,11 @@ def applicants(
                 resp_json = resp.json()
             except ValueError as e:
                 logger.warning(
-                    "Invalid JSON from Sumsub for customer_id=%s (will retry next run): %s",
+                    "Invalid JSON from Sumsub for customer_id=%s, skipping: %s",
                     customer_id,
                     e,
                 )
-                break
+                continue
 
             content_text = resp.text
             document_images: List[Dict[str, Optional[str]]] = []
