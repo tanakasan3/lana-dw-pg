@@ -44,18 +44,15 @@ with
         from int_core_deposit_events_rollup_sequence ers
         inner join relevant_deposits rd on ers.deposit_id = rd.deposit_id
         where status = 'Confirmed'
-        group by deposit_id
+        group by ers.deposit_id
     ),
     withdrawal_transactions as (
         select
             withdrawal_public_ids.id as numeroregistrobancario,
-            json_object(
-                'direccionAgencia',
-                bank_address.full_address,
-                'idDepartamento',
-                bank_address.region_id,
-                'idMunicipio',
-                bank_address.town_id
+            jsonb_build_object(
+                'direccionAgencia', bank_address.full_address,
+                'idDepartamento', bank_address.region_id,
+                'idMunicipio', bank_address.town_id
             ) as estacionservicio,
             wct.withdrawal_confirmed_at as fechatransaccion,
             cast(null as integer) as tipopersonaa,
@@ -63,7 +60,7 @@ with
             cast(null as integer) as tipopersonab,
             null as detallespersonab,
             aer.public_id as numerocuentapo,
-            "Cuenta Corriente" as clasecuentapo,
+            'Cuenta Corriente' as clasecuentapo,
             wer.reference as conceptotransaccionpo,
             wer.amount_usd as valorotrosmedioselectronicospo,
             cast(null as text) as numeroproductopb,
@@ -88,13 +85,10 @@ with
     deposit_transactions as (
         select
             deposit_public_ids.id as numeroregistrobancario,
-            json_object(
-                'direccionAgencia',
-                bank_address.full_address,
-                'idDepartamento',
-                bank_address.region_id,
-                'idMunicipio',
-                bank_address.town_id
+            jsonb_build_object(
+                'direccionAgencia', bank_address.full_address,
+                'idDepartamento', bank_address.region_id,
+                'idMunicipio', bank_address.town_id
             ) as estacionservicio,
             dct.deposit_confirmed_at as fechatransaccion,
             cast(null as integer) as tipopersonaa,
@@ -106,7 +100,7 @@ with
             der.reference as conceptotransaccionpo,
             der.amount_usd as valorotrosmedioselectronicospo,
             aer.public_id as numeroproductopb,
-            "Cuenta Corriente" as clasecuentapb,
+            'Cuenta Corriente' as clasecuentapb,
             der.amount_usd as montotransaccionpb,
             der.amount_usd as valormedioelectronicopb,
             cast(null as text) as bancocuentadestinatariapb

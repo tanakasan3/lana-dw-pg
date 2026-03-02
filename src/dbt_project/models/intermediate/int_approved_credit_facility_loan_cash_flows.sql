@@ -124,7 +124,7 @@ with
     projected_time_data as (
         select
             *,
-            extract(day from (period_end_date::date - period_start_date::date))::integer + 1 as days_in_period
+            (period_end_date::date - period_start_date::date)::integer + 1 as days_in_period
         from projected_cash_flow_data
     ),
 

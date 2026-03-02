@@ -7,7 +7,7 @@ with
     final as (
         select order_by, title, sum(coalesce(balance, 0)) as balance
         from config
-        left join chart on spaced_code in unnest(source_account_spaced_codes)
+        left join chart on spaced_code = any(source_account_spaced_codes)
         group by order_by, title
     )
 

@@ -6,8 +6,8 @@ with
             ac.account_code,
             cfg.title,
             cfg.eng_title,
-            cfg.account_name,
-            cfg.eng_account_name,
+            lc.account_name,
+            lc.eng_account_name,
             coalesce(lc.coefficient, 1) as coefficient
         from {{ ref("static_nrp_28_01_account_config") }} cfg
         cross join lateral unnest(cfg.sum_account_codes) as ac(account_code)
@@ -21,8 +21,8 @@ with
             ac.account_code,
             cfg.title,
             cfg.eng_title,
-            cfg.account_name,
-            cfg.eng_account_name,
+            lc.account_name,
+            lc.eng_account_name,
             -1 * coalesce(lc.coefficient, 1) as coefficient
         from {{ ref("static_nrp_28_01_account_config") }} cfg
         cross join lateral unnest(cfg.diff_account_codes) as ac(account_code)
