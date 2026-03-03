@@ -51,6 +51,7 @@ RUN pip install \
 # Add project code
 RUN mkdir -p /lana-dw-pg
 COPY src/ /lana-dw-pg/src/
+COPY scripts/ /lana-dw-pg/scripts/
 
 # Pre-generate dbt manifest at build time
 RUN DST_PG_HOST=placeholder \
