@@ -27,6 +27,8 @@ help:
 	@echo "  make materialize-bitfinex  Run Bitfinex EL jobs"
 	@echo "  make materialize-sumsub    Run Sumsub EL (needs SUMSUB_KEY/SECRET)"
 	@echo "                             Use SUMSUB_USE_TEST_IDS=true for test mode"
+	@echo "  make load-sumsub           Load Sumsub data from known external IDs"
+	@echo "                             (reads secrets/sumsub_external_user_ids.csv)"
 	@echo ""
 	@echo "Database:"
 	@echo "  make psql            Connect to destination PG"
@@ -133,6 +135,16 @@ ifdef SUMSUB_USE_TEST_IDS
 else
 	$(DAGSTER_JOB) -j sumsub_applicants_el
 endif
+
+# Load Sumsub applicants directly from known external user IDs (ad-hoc script)
+# CSV must have column: sumsub_external_user_id or external_user_id
+load-sumsub:
+	docker exec -e SUMSUB_KEY=$(SUMSUB_KEY) -e SUMSUB_SECRET=$(SUMSUB_SECRET) \
+		-e DST_PG_HOST=lana-dw-postgres -e DST_PG_PORT=5432 \
+		-e DST_PG_DATABASE=$(DST_PG_DATABASE) -e DST_PG_USER=$(DST_PG_USER) \
+		-e DST_PG_PASSWORD=$(DST_PG_PASSWORD) -e DST_RAW_SCHEMA=$(DST_RAW_SCHEMA) \
+		dagster-code-location python /lana-dw-pg/scripts/load_sumsub_applicants.py \
+		--csv /lana-dw-pg/secrets/sumsub_external_user_ids.csv $(LOAD_SUMSUB_ARGS)
 
 # =============================================================================
 # Database - Destination PG
