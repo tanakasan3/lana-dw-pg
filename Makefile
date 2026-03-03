@@ -138,12 +138,9 @@ endif
 
 # Load Sumsub applicants directly from known external user IDs (ad-hoc script)
 # CSV must have column: sumsub_external_user_id or external_user_id
+# Note: Uses DB connection env vars already set in container via docker-compose
 load-sumsub:
-	docker exec -e SUMSUB_KEY=$(SUMSUB_KEY) -e SUMSUB_SECRET=$(SUMSUB_SECRET) \
-		-e DST_PG_HOST=lana-dw-postgres -e DST_PG_PORT=5432 \
-		-e DST_PG_DATABASE=$(DST_PG_DATABASE) -e DST_PG_USER=$(DST_PG_USER) \
-		-e DST_PG_PASSWORD=$(DST_PG_PASSWORD) -e DST_RAW_SCHEMA=$(DST_RAW_SCHEMA) \
-		dagster-code-location python /lana-dw-pg/scripts/load_sumsub_applicants.py \
+	docker exec dagster-code-location python /lana-dw-pg/scripts/load_sumsub_applicants.py \
 		--csv /lana-dw-pg/secrets/sumsub_external_user_ids.csv $(LOAD_SUMSUB_ARGS)
 
 # =============================================================================
